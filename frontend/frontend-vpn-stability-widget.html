@@ -2,32 +2,33 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>VPN安定性ランキングWidget</title>
     
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: #f5f7fa;
             color: #333;
-            padding: 15px;
+            padding: 10px;
+            overflow-x: hidden;
         }
-        .widget-container {
-            max-width: 540px;
-            margin: 0 auto;
-        }
-        h2 {
+        h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 8px;
-            font-size: 1.4em;
+            margin: 10px 0;
+            font-size: 1.3em;
         }
         .subtitle {
             text-align: center;
             color: #7f8c8d;
             margin-bottom: 20px;
-            font-size: 0.9em;
+            font-size: 0.85em;
         }
         .region-selector {
             display: flex;
@@ -40,117 +41,99 @@
             background: white;
             border: 2px solid #667eea;
             color: #667eea;
-            padding: 8px 16px;
+            padding: 8px 15px;
             border-radius: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
             font-size: 0.85em;
-            font-weight: 500;
-        }
-        .region-btn:hover {
-            background: #f0f0f0;
         }
         .region-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: transparent;
-        }
-        .ranking-container {
-            background: white;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .ranking-title {
-            font-size: 1.1em;
-            font-weight: 600;
-            margin-bottom: 15px;
-            color: #2c3e50;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .stability-table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        .stability-table th {
             background: #667eea;
             color: white;
-            padding: 10px 8px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.85em;
         }
-        .stability-table td {
-            padding: 10px 8px;
-            border-bottom: 1px solid #eee;
-            font-size: 0.9em;
+        
+        /* VPNカード */
+        .vpn-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .stability-table th:nth-child(1),
-        .stability-table td:nth-child(1) { width: 12%; text-align: center; }
-        .stability-table th:nth-child(2),
-        .stability-table td:nth-child(2) { width: 30%; }
-        .stability-table th:nth-child(3),
-        .stability-table td:nth-child(3) { width: 28%; }
-        .stability-table th:nth-child(4),
-        .stability-table td:nth-child(4) { width: 30%; text-align: right; }
-        .stability-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-        .rank-badge {
-            display: inline-block;
-            width: 28px;
-            height: 28px;
-            line-height: 28px;
-            text-align: center;
-            border-radius: 50%;
-            font-weight: bold;
-            font-size: 0.9em;
-        }
-        .rank-1 { background: #ffd700; color: #333; }
-        .rank-2 { background: #c0c0c0; color: #333; }
-        .rank-3 { background: #cd7f32; color: white; }
-        .score-bar {
+        .card-header {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+        .rank-badge {
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .rank-1 { background: #ffd700; }
+        .rank-2 { background: #c0c0c0; }
+        .rank-3 { background: #cd7f32; color: white; }
+        .vpn-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .score-section {
+            margin-bottom: 10px;
+        }
+        .score-label {
+            color: #7f8c8d;
+            font-size: 0.85em;
+            margin-bottom: 5px;
         }
         .score-value {
-            font-weight: 600;
+            font-size: 1.3em;
+            font-weight: bold;
             color: #667eea;
-            min-width: 35px;
-            font-size: 0.95em;
+            margin-bottom: 5px;
         }
-        .bar {
-            flex: 1;
-            height: 6px;
+        .score-bar {
+            height: 8px;
             background: #e0e0e0;
-            border-radius: 3px;
+            border-radius: 4px;
             overflow: hidden;
         }
-        .bar-fill {
+        .score-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #667eea, #764ba2);
         }
-        .loading {
-            text-align: center;
-            padding: 20px;
-            color: #666;
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-top: 1px solid #f0f0f0;
             font-size: 0.9em;
         }
+        .info-label {
+            color: #7f8c8d;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
         .footer-link {
             text-align: center;
             margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid #eee;
+            padding: 12px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
         .footer-link a {
             color: #667eea;
             text-decoration: none;
-            font-size: 0.9em;
-            font-weight: 500;
+            font-size: 0.95em;
+            font-weight: 600;
         }
         .footer-link a:hover {
             text-decoration: underline;
@@ -161,118 +144,108 @@
             font-size: 0.75em;
             margin-top: 10px;
         }
-        
-        @media (max-width: 480px) {
-            h2 { font-size: 1.2em; }
-            .region-btn { padding: 6px 12px; font-size: 0.8em; }
-            .ranking-container { padding: 15px; }
-            .stability-table th,
-            .stability-table td { padding: 8px 5px; font-size: 0.8em; }
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #999;
         }
     </style>
 </head>
 <body>
-    <div class="widget-container">
-        <h2>📊 VPN安定性ランキング</h2>
-        <p class="subtitle">速度だけじゃない。本当に「安定した」VPN</p>
-        
-        <div class="region-selector">
-            <button class="region-btn active" onclick="switchRegion('JP')">🇯🇵 日本</button>
-            <button class="region-btn" onclick="switchRegion('US')">🇺🇸 米国</button>
-            <button class="region-btn" onclick="switchRegion('UK')">🇬🇧 英国</button>
-            <button class="region-btn" onclick="switchRegion('SG')">🇸🇬 シンガポール</button>
-        </div>
-        
-        <div class="ranking-container">
-            <div class="ranking-title">
-                📈 安定性TOP5（過去30日）
-            </div>
-            <div id="stabilityTable" class="loading">データを読み込んでいます...</div>
-            
-            <div class="footer-link">
-                <a href="https://www.blstweb.jp/network/vpn/vpn-stability-ranking/" target="_blank">
-                    詳細ランキングを見る →
-                </a>
-            </div>
-            
-            <div class="update-time" id="updateTime"></div>
-        </div>
+    <h1>📊 VPN安定性ランキング</h1>
+    <p class="subtitle">本当に「安定した」VPN TOP5</p>
+    
+    <div class="region-selector">
+        <button class="region-btn active" onclick="switchRegion('JP')">🇯🇵 日本</button>
+        <button class="region-btn" onclick="switchRegion('US')">🇺🇸 米国</button>
+        <button class="region-btn" onclick="switchRegion('UK')">🇬🇧 英国</button>
+        <button class="region-btn" onclick="switchRegion('SG')">🇸🇬 シンガポール</button>
     </div>
     
+    <div id="rankingCards" class="loading">データを読み込んでいます...</div>
+    
+    <div class="footer-link">
+        <a href="https://www.blstweb.jp/network/vpn/vpn-stability-ranking/" target="_blank">
+            全ランキング・詳細分析を見る →
+        </a>
+    </div>
+    
+    <div class="update-time" id="updateTime"></div>
+    
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyAoHuuY0SNWlnqpmxipMIDZLOe55saUBhxri2a-aiBUgsLNDB-QB93xSLcU8fmlK7M/exec';
-        let currentRegion = 'JP';
+        const API = 'https://script.google.com/macros/s/AKfycbyAoHuuY0SNWlnqpmxipMIDZLOe55saUBhxri2a-aiBUgsLNDB-QB93xSLcU8fmlK7M/exec';
+        let region = 'JP';
         
-        function switchRegion(region) {
-            currentRegion = region;
-            
-            document.querySelectorAll('.region-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+        function switchRegion(r) {
+            region = r;
+            document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
-            
-            loadStabilityData(region);
+            load();
         }
         
-        async function loadStabilityData(region = 'JP') {
+        async function load() {
             try {
-                const response = await fetch(`${API_URL}?type=stability&region=${region}`);
-                const data = await response.json();
+                const res = await fetch(`${API}?type=stability&region=${region}`);
+                const data = await res.json();
                 
-                renderStabilityTable(data.data.slice(0, 5)); // TOP5のみ
+                // TOP5のみ表示
+                showCards(data.data.slice(0, 5));
                 
                 // 更新時刻表示
                 const updateTime = new Date(data.lastUpdate);
                 document.getElementById('updateTime').textContent = 
                     `最終更新: ${updateTime.toLocaleString('ja-JP')}`;
                 
-            } catch (error) {
-                console.error('Error loading stability data:', error);
-                document.getElementById('stabilityTable').innerHTML = 
-                    '<div class="loading" style="color: #dc3545;">データの読み込みに失敗しました</div>';
+            } catch (e) {
+                document.getElementById('rankingCards').innerHTML = 
+                    '<div class="loading" style="color:#dc3545;">読み込みエラー</div>';
             }
         }
         
-        function renderStabilityTable(data) {
-            let html = '<table class="stability-table">';
-            html += '<thead><tr>';
-            html += '<th>順位</th>';
-            html += '<th>VPN</th>';
-            html += '<th>安定性</th>';
-            html += '<th>平均速度</th>';
-            html += '</tr></thead>';
-            html += '<tbody>';
-            
-            data.forEach((vpn, index) => {
-                const rank = index + 1;
+        function showCards(data) {
+            let html = '';
+            data.forEach((vpn, i) => {
+                const rank = i + 1;
+                const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
                 const rankClass = rank <= 3 ? `rank-${rank}` : '';
-                const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
                 
-                html += `<tr>`;
-                html += `<td><span class="rank-badge ${rankClass}">${rankIcon}</span></td>`;
-                html += `<td><strong>${vpn.name}</strong></td>`;
-                html += `<td>
-                    <div class="score-bar">
-                        <span class="score-value">${vpn.stabilityScore}</span>
-                        <div class="bar"><div class="bar-fill" style="width: ${vpn.stabilityScore}%"></div></div>
+                html += `
+                <div class="vpn-card">
+                    <div class="card-header">
+                        <div class="rank-badge ${rankClass}">${icon}</div>
+                        <div class="vpn-name">${vpn.name}</div>
                     </div>
-                </td>`;
-                html += `<td>${vpn.avgSpeed} Mbps</td>`;
-                html += `</tr>`;
+                    <div class="score-section">
+                        <div class="score-label">安定性スコア</div>
+                        <div class="score-value">${vpn.stabilityScore}</div>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width:${vpn.stabilityScore}%"></div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">平均速度</span>
+                        <span class="info-value">${vpn.avgSpeed} Mbps</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">ばらつき</span>
+                        <span class="info-value">±${vpn.speedStdDev} Mbps</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">信頼性</span>
+                        <span class="info-value">${vpn.reliability}%</span>
+                    </div>
+                </div>`;
             });
+            document.getElementById('rankingCards').innerHTML = html;
             
-            html += '</tbody></table>';
-            document.getElementById('stabilityTable').innerHTML = html;
-            
-            // 高さ調整メッセージ送信（親ウィンドウ用）
+            // 親ウィンドウに高さを通知（iframe埋め込み用）
             if (window.parent !== window) {
                 const height = document.body.scrollHeight;
                 window.parent.postMessage({ type: 'resize', height: height }, '*');
             }
         }
         
-        // 初回ロード
-        loadStabilityData('JP');
+        load();
     </script>
 </body>
 </html>
