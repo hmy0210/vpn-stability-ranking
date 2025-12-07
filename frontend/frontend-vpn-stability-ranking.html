@@ -2,345 +2,283 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VPN安定性ランキング【実測データ】</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>VPN安定性ランキング</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
-    
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box;
+        }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             background: #f5f7fa;
             color: #333;
-        }
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 20px;
+            padding: 10px;
+            overflow-x: hidden;
         }
         h1 {
             text-align: center;
             color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 2em;
+            margin: 10px 0;
+            font-size: 1.3em;
         }
         .subtitle {
             text-align: center;
             color: #7f8c8d;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
+            font-size: 0.85em;
         }
         .region-selector {
             display: flex;
             justify-content: center;
-            gap: 10px;
-            margin-bottom: 30px;
+            gap: 8px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
         .region-btn {
             background: white;
             border: 2px solid #667eea;
             color: #667eea;
-            padding: 10px 20px;
-            border-radius: 25px;
+            padding: 8px 15px;
+            border-radius: 20px;
             cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .region-btn:hover {
-            background: #f0f0f0;
+            font-size: 0.85em;
         }
         .region-btn.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border-color: transparent;
-        }
-        .chart-container {
-            background: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        .chart-title {
-            font-size: 1.3em;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #2c3e50;
-        }
-        .chart-wrapper {
-            position: relative;
-            min-height: 400px;
-            margin-top: 20px;
-        }
-        .stability-table {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
-        .stability-table th {
             background: #667eea;
             color: white;
-            padding: 12px 8px;
-            text-align: left;
-            font-weight: 600;
-            font-size: 0.9em;
         }
-        .stability-table td {
-            padding: 12px 8px;
-            border-bottom: 1px solid #eee;
+        
+        /* VPNカード */
+        .vpn-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        .stability-table th:nth-child(1),
-        .stability-table td:nth-child(1) { width: 10%; text-align: center; }
-        .stability-table th:nth-child(2),
-        .stability-table td:nth-child(2) { width: 22%; }
-        .stability-table th:nth-child(3),
-        .stability-table td:nth-child(3) { width: 22%; }
-        .stability-table th:nth-child(4),
-        .stability-table td:nth-child(4) { width: 16%; text-align: right; }
-        .stability-table th:nth-child(5),
-        .stability-table td:nth-child(5) { width: 16%; text-align: right; }
-        .stability-table th:nth-child(6),
-        .stability-table td:nth-child(6) { width: 14%; text-align: right; }
-        .stability-table tbody tr:hover {
-            background: #f8f9fa;
-        }
-        .rank-badge {
-            display: inline-block;
-            width: 30px;
-            height: 30px;
-            line-height: 30px;
-            text-align: center;
-            border-radius: 50%;
-            font-weight: bold;
-        }
-        .rank-1 { background: #ffd700; color: #333; }
-        .rank-2 { background: #c0c0c0; color: #333; }
-        .rank-3 { background: #cd7f32; color: white; }
-        .score-bar {
+        .card-header {
             display: flex;
             align-items: center;
             gap: 10px;
+            margin-bottom: 12px;
+        }
+        .rank-badge {
+            width: 32px;
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+            border-radius: 50%;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+        .rank-1 { background: #ffd700; }
+        .rank-2 { background: #c0c0c0; }
+        .rank-3 { background: #cd7f32; color: white; }
+        .vpn-name {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .score-section {
+            margin-bottom: 10px;
+        }
+        .score-label {
+            color: #7f8c8d;
+            font-size: 0.85em;
+            margin-bottom: 5px;
         }
         .score-value {
-            font-weight: 600;
+            font-size: 1.3em;
+            font-weight: bold;
             color: #667eea;
-            min-width: 40px;
+            margin-bottom: 5px;
         }
-        .bar {
-            flex: 1;
+        .score-bar {
             height: 8px;
             background: #e0e0e0;
             border-radius: 4px;
             overflow: hidden;
         }
-        .bar-fill {
+        .score-fill {
             height: 100%;
-            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
-            transition: width 0.5s ease;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-top: 1px solid #f0f0f0;
+            font-size: 0.9em;
+        }
+        .info-label {
+            color: #7f8c8d;
+        }
+        .info-value {
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        
+        .section {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .section-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        canvas {
+            max-width: 100%;
+            height: auto !important;
         }
         .loading {
             text-align: center;
             padding: 20px;
-            color: #666;
-        }
-        
-        @media (max-width: 768px) {
-            h1 { font-size: 1.5em; }
-            .chart-container { padding: 20px; }
-            .chart-wrapper { min-height: 300px; }
+            color: #999;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📊 VPN安定性ランキング</h1>
-        <p class="subtitle">速度だけじゃない。本当に「安定した」VPNはどれ？</p>
-        
-        <div class="region-selector">
-            <button class="region-btn active" onclick="switchRegion('JP')">🇯🇵 日本</button>
-            <button class="region-btn" onclick="switchRegion('US')">🇺🇸 米国</button>
-            <button class="region-btn" onclick="switchRegion('UK')">🇬🇧 英国</button>
-            <button class="region-btn" onclick="switchRegion('SG')">🇸🇬 シンガポール</button>
-        </div>
-        
-        <!-- 安定性ランキングテーブル -->
-        <div class="chart-container">
-            <div class="chart-title">📈 総合安定性ランキング（過去30日）</div>
-            <div id="stabilityTable" class="loading">データを読み込んでいます...</div>
-        </div>
-        
-        <!-- レーダーチャート -->
-        <div class="chart-container">
-            <div class="chart-title">🎯 5軸評価レーダーチャート（TOP3）</div>
-            <div class="chart-wrapper">
-                <canvas id="radarChart"></canvas>
-            </div>
-        </div>
-        
-        <!-- 時系列推移グラフ -->
-        <div class="chart-container">
-            <div class="chart-title">📊 速度推移（過去30日）</div>
-            <div class="chart-wrapper">
-                <canvas id="trendChart"></canvas>
-            </div>
+    <h1>📊 VPN安定性ランキング</h1>
+    <p class="subtitle">本当に「安定した」VPNはどれ？</p>
+    
+    <div class="region-selector">
+        <button class="region-btn active" onclick="switchRegion('JP')">🇯🇵 日本</button>
+        <button class="region-btn" onclick="switchRegion('US')">🇺🇸 米国</button>
+        <button class="region-btn" onclick="switchRegion('UK')">🇬🇧 英国</button>
+        <button class="region-btn" onclick="switchRegion('SG')">🇸🇬 シンガポール</button>
+    </div>
+    
+    <div id="rankingCards" class="loading">データを読み込んでいます...</div>
+    
+    <div class="section">
+        <div class="section-title">🎯 5軸評価（TOP3）</div>
+        <canvas id="radarChart"></canvas>
+    </div>
+    
+    <div id="trendSection" class="section">
+        <div class="section-title">📊 速度推移（過去30日）</div>
+        <div style="text-align:center; padding:40px 20px; color:#999;">
+            <div style="font-size:3em; margin-bottom:10px;">📈</div>
+            <div style="font-size:1.1em; font-weight:600; margin-bottom:8px; color:#666;">データを蓄積中</div>
+            <div style="font-size:0.9em;">6時間ごとに測定しています</div>
+            <div style="font-size:0.9em; margin-top:5px;">24時間後に表示されます</div>
         </div>
     </div>
     
     <script>
-        const API_URL = 'https://script.google.com/macros/s/AKfycbyAoHuuY0SNWlnqpmxipMIDZLOe55saUBhxri2a-aiBUgsLNDB-QB93xSLcU8fmlK7M/exec';
-        let currentRegion = 'JP';
-        let radarChartInstance = null;
-        let trendChartInstance = null;
+        const API = 'https://script.google.com/macros/s/AKfycbyAoHuuY0SNWlnqpmxipMIDZLOe55saUBhxri2a-aiBUgsLNDB-QB93xSLcU8fmlK7M/exec';
+        let region = 'JP';
+        let radar = null;
+        let trend = null;
         
-        function switchRegion(region) {
-            currentRegion = region;
-            
-            document.querySelectorAll('.region-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
+        function switchRegion(r) {
+            region = r;
+            document.querySelectorAll('.region-btn').forEach(b => b.classList.remove('active'));
             event.target.classList.add('active');
-            
-            loadStabilityData(region);
+            load();
         }
         
-        async function loadStabilityData(region = 'JP') {
+        async function load() {
             try {
-                // 安定性ランキング取得
-                const stabilityResponse = await fetch(`${API_URL}?type=stability&region=${region}`);
-                const stabilityData = await stabilityResponse.json();
+                const res = await fetch(`${API}?type=stability&region=${region}`);
+                const data = await res.json();
+                showCards(data.data);
                 
-                // テーブル描画
-                renderStabilityTable(stabilityData.data);
+                const radarRes = await fetch(`${API}?type=radar&region=${region}`);
+                const radarData = await radarRes.json();
+                showRadar(radarData.data);
                 
-                // レーダーチャート用データ取得
-                const radarResponse = await fetch(`${API_URL}?type=radar&region=${region}`);
-                const radarData = await radarResponse.json();
-                
-                // レーダーチャート描画
-                renderRadarChart(radarData.data);
-                
-                // 推移グラフ描画（TOP3のみ、データがあれば）
-                if (stabilityData.data.length >= 3 && stabilityData.data[0].dataPoints > 1) {
-                    renderTrendChart(stabilityData.data.slice(0, 3), region);
-                } else {
-                    document.getElementById('trendChart').parentElement.innerHTML = 
-                        '<div class="chart-title">📊 速度推移（過去30日）</div>' +
-                        '<div style="text-align: center; padding: 40px; color: #999;">データを蓄積中です（測定データ: ' + 
-                        (stabilityData.data[0]?.dataPoints || 0) + '件）<br>24時間後に表示されます</div>';
-                }
-                
-            } catch (error) {
-                console.error('Error loading stability data:', error);
-                document.getElementById('stabilityTable').innerHTML = 
-                    '<div class="loading" style="color: #dc3545;">データの読み込みに失敗しました</div>';
+                // 常にshowTrendを呼ぶ（データ不足の場合はメッセージ表示）
+                showTrend(data.data.slice(0, 3));
+            } catch (e) {
+                document.getElementById('rankingCards').innerHTML = 
+                    '<div class="loading" style="color:#dc3545;">読み込みエラー</div>';
             }
         }
         
-        function renderStabilityTable(data) {
-            let html = '<table class="stability-table">';
-            html += '<thead><tr>';
-            html += '<th>ランク</th>';
-            html += '<th>VPN</th>';
-            html += '<th>安定性</th>';
-            html += '<th>平均速度</th>';
-            html += '<th>ばらつき</th>';
-            html += '<th>信頼性</th>';
-            html += '</tr></thead>';
-            html += '<tbody>';
-            
-            data.forEach((vpn, index) => {
-                const rank = index + 1;
+        function showCards(data) {
+            let html = '';
+            data.forEach((vpn, i) => {
+                const rank = i + 1;
+                const icon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
                 const rankClass = rank <= 3 ? `rank-${rank}` : '';
-                const rankIcon = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : rank;
                 
-                html += `<tr>`;
-                html += `<td><span class="rank-badge ${rankClass}">${rankIcon}</span></td>`;
-                html += `<td><strong>${vpn.name}</strong></td>`;
-                html += `<td>
-                    <div class="score-bar">
-                        <span class="score-value">${vpn.stabilityScore}</span>
-                        <div class="bar"><div class="bar-fill" style="width: ${vpn.stabilityScore}%"></div></div>
+                html += `
+                <div class="vpn-card">
+                    <div class="card-header">
+                        <div class="rank-badge ${rankClass}">${icon}</div>
+                        <div class="vpn-name">${vpn.name}</div>
                     </div>
-                </td>`;
-                html += `<td>${vpn.avgSpeed} Mbps</td>`;
-                html += `<td>±${vpn.speedStdDev} Mbps</td>`;
-                html += `<td>${vpn.reliability}%</td>`;
-                html += `</tr>`;
+                    <div class="score-section">
+                        <div class="score-label">安定性スコア</div>
+                        <div class="score-value">${vpn.stabilityScore}</div>
+                        <div class="score-bar">
+                            <div class="score-fill" style="width:${vpn.stabilityScore}%"></div>
+                        </div>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">平均速度</span>
+                        <span class="info-value">${vpn.avgSpeed} Mbps</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">ばらつき</span>
+                        <span class="info-value">±${vpn.speedStdDev} Mbps</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">信頼性</span>
+                        <span class="info-value">${vpn.reliability}%</span>
+                    </div>
+                </div>`;
             });
-            
-            html += '</tbody></table>';
-            document.getElementById('stabilityTable').innerHTML = html;
+            document.getElementById('rankingCards').innerHTML = html;
         }
         
-        function renderRadarChart(data) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
+        function showRadar(data) {
+            const ctx = document.getElementById('radarChart');
+            if (radar) radar.destroy();
             
-            if (radarChartInstance) {
-                radarChartInstance.destroy();
-            }
-            
-            const datasets = data.slice(0, 3).map((vpn, index) => ({
-                label: vpn.name,
-                data: [
-                    vpn.scores.speed,
-                    vpn.scores.stability,
-                    vpn.scores.regional,
-                    vpn.scores.ping,
-                    vpn.scores.reliability
-                ],
-                borderColor: getColor(index),
-                backgroundColor: getColor(index, 0.15),
-                borderWidth: 3,
-                pointBackgroundColor: getColor(index),
-                pointBorderColor: '#fff',
-                pointBorderWidth: 2,
-                pointRadius: 5
-            }));
-            
-            radarChartInstance = new Chart(ctx, {
+            radar = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: ['速度', '安定性', '地域カバー', 'Ping', '信頼性'],
-                    datasets: datasets
+                    datasets: data.slice(0, 3).map((v, i) => ({
+                        label: v.name,
+                        data: [v.scores.speed, v.scores.stability, v.scores.regional, v.scores.ping, v.scores.reliability],
+                        borderColor: getColor(i),
+                        backgroundColor: getColor(i, 0.1),
+                        borderWidth: 2
+                    }))
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: true,
-                    aspectRatio: 1.5,
+                    aspectRatio: 1,
                     scales: {
                         r: {
                             beginAtZero: true,
                             max: 100,
-                            min: 0,
                             ticks: { 
                                 stepSize: 20,
-                                font: { size: 14 },
-                                backdropColor: 'transparent'
+                                font: { size: 10 }
                             },
                             pointLabels: {
-                                font: { size: 16, weight: 'bold' }
-                            },
-                            grid: {
-                                color: 'rgba(0, 0, 0, 0.1)'
-                            },
-                            angleLines: {
-                                color: 'rgba(0, 0, 0, 0.1)'
+                                font: { size: 11, weight: 'bold' }
                             }
                         }
                     },
                     plugins: {
                         legend: { 
                             position: 'bottom',
-                            labels: {
-                                font: { size: 16 },
-                                padding: 20,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.r + '/100';
-                                }
+                            labels: { 
+                                font: { size: 11 },
+                                padding: 10
                             }
                         }
                     }
@@ -348,118 +286,80 @@
             });
         }
         
-        async function renderTrendChart(topVPNs, region) {
-            const ctx = document.getElementById('trendChart').getContext('2d');
+        async function showTrend(vpns) {
+            const trendSection = document.getElementById('trendSection');
             
-            if (trendChartInstance) {
-                trendChartInstance.destroy();
-            }
-            
-            const datasets = [];
-            
-            for (let i = 0; i < Math.min(3, topVPNs.length); i++) {
-                const vpn = topVPNs[i];
+            try {
+                const datasets = [];
+                for (let i = 0; i < vpns.length; i++) {
+                    try {
+                        const res = await fetch(`${API}?type=trend&vpn=${encodeURIComponent(vpns[i].name)}&region=${region}`);
+                        const data = await res.json();
+                        
+                        if (data.data && data.data.length > 1) {
+                            datasets.push({
+                                label: vpns[i].name,
+                                data: data.data.map(d => ({x: d.date, y: d.speed})),
+                                borderColor: getColor(i),
+                                borderWidth: 2,
+                                fill: false,
+                                tension: 0.4
+                            });
+                        }
+                    } catch (err) {
+                        console.log(`trend error for ${vpns[i].name}:`, err);
+                    }
+                }
                 
-                try {
-                    const trendResponse = await fetch(`${API_URL}?type=trend&vpn=${encodeURIComponent(vpn.name)}&region=${region}`);
-                    const trendData = await trendResponse.json();
+                // データがあればグラフを表示
+                if (datasets.length > 0) {
+                    trendSection.innerHTML = `
+                        <div class="section-title">📊 速度推移（過去30日）</div>
+                        <canvas id="trendChart"></canvas>
+                    `;
                     
-                    if (trendData.data && trendData.data.length > 1) {
-                        datasets.push({
-                            label: vpn.name,
-                            data: trendData.data.map(d => ({ x: d.date, y: d.speed })),
-                            borderColor: getColor(i),
-                            backgroundColor: getColor(i, 0.1),
-                            borderWidth: 3,
-                            fill: true,
-                            tension: 0.4,
-                            pointRadius: 0,
-                            pointHoverRadius: 5
-                        });
-                    }
-                } catch (error) {
-                    console.error(`Error loading trend for ${vpn.name}:`, error);
-                }
-            }
-            
-            if (datasets.length === 0) {
-                document.getElementById('trendChart').parentElement.innerHTML = 
-                    '<div class="chart-title">📊 速度推移（過去30日）</div>' +
-                    '<div style="text-align: center; padding: 40px; color: #999;">データを蓄積中です<br>24時間後に表示されます</div>';
-                return;
-            }
-            
-            trendChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: { datasets: datasets },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    aspectRatio: 2,
-                    interaction: {
-                        intersect: false,
-                        mode: 'index'
-                    },
-                    scales: {
-                        x: { 
-                            type: 'time',
-                            time: { 
-                                unit: 'day',
-                                displayFormats: { day: 'MM/DD' }
+                    const ctx = document.getElementById('trendChart');
+                    if (trend) trend.destroy();
+                    
+                    trend = new Chart(ctx, {
+                        type: 'line',
+                        data: { datasets },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: true,
+                            aspectRatio: 1.5,
+                            scales: {
+                                x: { 
+                                    type: 'time',
+                                    time: { unit: 'day' }
+                                },
+                                y: { 
+                                    beginAtZero: false,
+                                    ticks: { font: { size: 10 } }
+                                }
                             },
-                            title: { 
-                                display: true, 
-                                text: '日付',
-                                font: { size: 14 }
-                            }
-                        },
-                        y: { 
-                            beginAtZero: false,
-                            title: { 
-                                display: true, 
-                                text: '速度 (Mbps)',
-                                font: { size: 14 }
-                            },
-                            ticks: { 
-                                stepSize: 50,
-                                font: { size: 12 }
-                            }
-                        }
-                    },
-                    plugins: {
-                        legend: { 
-                            position: 'bottom',
-                            labels: {
-                                font: { size: 16 },
-                                padding: 20,
-                                usePointStyle: true
-                            }
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': ' + Math.round(context.parsed.y) + ' Mbps';
+                            plugins: {
+                                legend: { 
+                                    position: 'bottom',
+                                    labels: { font: { size: 11 } }
                                 }
                             }
                         }
-                    }
+                    });
                 }
-            });
+                // データがない場合は既存のメッセージをそのまま表示
+            } catch (err) {
+                console.log('trend section error:', err);
+                // エラーの場合も既存のメッセージを表示
+            }
         }
         
-        function getColor(index, alpha = 1) {
-            const colors = [
-                `rgba(102, 126, 234, ${alpha})`,
-                `rgba(118, 75, 162, ${alpha})`,
-                `rgba(237, 100, 166, ${alpha})`,
-                `rgba(255, 154, 158, ${alpha})`,
-                `rgba(250, 208, 196, ${alpha})`
-            ];
-            return colors[index % colors.length];
+        function getColor(i, a = 1) {
+            const c = ['102,126,234', '118,75,162', '237,100,166'];
+            return `rgba(${c[i % 3]},${a})`;
         }
         
-        // 初回ロード
-        loadStabilityData('JP');
+        load();
     </script>
 </body>
 </html>
