@@ -6,7 +6,7 @@ Real-time VPN speed and stability monitoring system from Tokyo, Japan.
 
 Automated VPN performance monitoring system that tests 15 major VPN services every 6 hours from Tokyo. Provides real-time speed rankings, stability scores, and security diagnostics.
 
-**Live Demo:** https://www.blstweb.jp/network/vpn/vpn-speed-ranking/
+**Live Demo:** https://www.blstweb.jp/network/vpn/
 
 ### Key Features
 
