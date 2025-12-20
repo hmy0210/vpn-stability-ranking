@@ -296,7 +296,7 @@ Add Mullvad to VPN_LIST with appropriate configuration.
 **Do NOT open public issues for security vulnerabilities.**
 
 Instead:
-1. Email: security@your-domain.com
+1. Email: takeshi.hamaya@blstweb.jp
 2. Include detailed description
 3. Provide steps to reproduce
 4. Allow time for fix before disclosure
@@ -336,7 +336,7 @@ Violations may result in:
 2. Temporary ban
 3. Permanent ban
 
-Report issues to: conduct@your-domain.com
+Report issues to: takeshi.hamaya@blstweb.jp
 
 ## 🏆 Recognition
 
@@ -349,7 +349,7 @@ Contributors will be:
 
 - GitHub Discussions
 - GitHub Issues
-- Email: contribute@your-domain.com
+- Email: takeshi.hamaya@blstweb.jp
 
 ## 📚 Resources
 
