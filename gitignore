@@ -1,0 +1,95 @@
+# ============================================
+# VPN Stability Ranking - .gitignore
+# ============================================
+
+# Configuration files with sensitive data
+config.gs
+**/config.gs
+.env
+.env.local
+
+# API Keys and credentials
+**/api-keys.json
+**/credentials.json
+**/secrets.json
+
+# Spreadsheet IDs
+**/spreadsheet-ids.txt
+
+# Twitter API credentials
+twitter-config.gs
+
+# ScraperAPI credentials
+scraper-config.gs
+
+# Google Apps Script
+.clasp.json
+.claspignore
+
+# Node modules (if using any local tooling)
+node_modules/
+package-lock.json
+yarn.lock
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+*~
+.directory
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.settings/
+.classpath
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Temporary files
+*.tmp
+*.temp
+temp/
+tmp/
+
+# Backup files
+*.bak
+*.backup
+*~
+
+# Test data
+test-data/
+sample-data/
+
+# Build outputs
+dist/
+build/
+out/
+
+# Cache
+.cache/
+*.cache
+
+# Coverage
+coverage/
+.nyc_output/
+
+# Private documentation
+private-docs/
+internal-notes/
