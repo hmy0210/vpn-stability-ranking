@@ -1,4 +1,4 @@
-# 🚀 VPN Stability Ranking
+# 🚀 Tokyo VPN Speed Monitor
 
 Real-time VPN speed and stability monitoring system from Tokyo, Japan.
 
