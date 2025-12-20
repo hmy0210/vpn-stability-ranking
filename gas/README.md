@@ -1,6 +1,6 @@
 # Google Apps Script Files
 
-This directory contains all Google Apps Script files for the VPN Stability Ranking system.
+This directory contains all Google Apps Script files for the Tokyo VPN Speed Monitor.
 
 ## 📦 Files
 
