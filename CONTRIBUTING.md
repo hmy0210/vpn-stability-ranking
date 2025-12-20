@@ -1,4 +1,4 @@
-# Contributing to VPN Stability Ranking
+# Contributing to Tokyo VPN Speed Monitor
 
 Thank you for your interest in contributing! This document provides guidelines for contributing to the project.
 
