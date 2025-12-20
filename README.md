@@ -1,352 +1,204 @@
-# VPN Stability Ranking System
+# 🚀 VPN Stability Ranking
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Google Apps Script](https://img.shields.io/badge/Google%20Apps%20Script-4285F4?logo=google&logoColor=white)](https://script.google.com)
-[![Twitter Bot](https://img.shields.io/badge/Twitter-1DA1F2?logo=twitter&logoColor=white)](https://twitter.com/remoteaccessvpn)
+Real-time VPN speed and stability monitoring system from Tokyo, Japan.
 
-**Automated VPN stability ranking system with real-time data updates and multi-region support.**
+![VPN Speed Ranking Dashboard](docs/screenshots/dashboard.png)
 
-[🇯🇵 日本語版README](./README_ja.md) | [🌐 Live Demo](https://www.blstweb.jp/network/vpn/vpn-stability-ranking/)
+## 📊 Overview
 
----
+Automated VPN performance monitoring system that tests 15 major VPN services every 6 hours from Tokyo. Provides real-time speed rankings, stability scores, and security diagnostics.
 
-## 🎯 What's This?
+**Live Demo:** https://www.blstweb.jp/network/vpn/vpn-speed-ranking/
 
-A fully automated system that measures and ranks VPN stability across 4 regions:
-- 🇯🇵 Japan (Tokyo)
-- 🇺🇸 United States (Virginia)
-- 🇬🇧 United Kingdom (London)
-- 🇸🇬 Singapore
+### Key Features
 
-**Key Features:**
-- ✅ Automated measurements every 6 hours
-- ✅ Stability scoring based on 30-day historical data
-- ✅ Multi-region comparison
-- ✅ Real-time API
-- ✅ Interactive charts (Radar, Trend)
-- ✅ Twitter bot (3x daily updates)
-- ✅ **100% free** to run (Google Apps Script)
+- ✅ **Automated Testing** - Tests 15 VPNs every 6 hours (4 times daily)
+- 📊 **Real-time Rankings** - Live speed and stability rankings
+- 🔍 **Security Diagnostics** - DNS leak, WebRTC leak, IPv6 leak detection
+- 💰 **Price Monitoring** - Daily price tracking with change alerts
+- 📰 **News Monitoring** - VPN-related news aggregation
+- 📈 **Quarterly Reports** - Automated market analysis reports
+- 🐦 **Auto Posting** - Twitter alerts for price changes and outages
 
----
+### Current Stats
 
-## 📊 Live Demo
-
-**Main Dashboard:**
-https://www.blstweb.jp/network/vpn/vpn-stability-ranking/
-
-**Widget:**
-https://www.blstweb.jp/network/vpn/vpn-stability-ranking/widget/
-
-**Twitter Bot:**
-https://twitter.com/remoteaccessvpn
-
----
-
-## 🏗️ Architecture
-
-```
-┌─────────────────────────────────────────┐
-│  Google Apps Script (Measurement)       │
-│  - Automated data collection (6h)       │
-│  - Stability score calculation          │
-│  - Multi-region support                 │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  Google Sheets (Database)               │
-│  - Historical data storage               │
-│  - 30-day rolling window                │
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  Web Apps API                           │
-│  - /exec?type=stability&region=JP       │
-│  - /exec?type=radar&region=US           │
-│  - /exec?type=trend&vpn=NordVPN&region=UK│
-└──────────────┬──────────────────────────┘
-               │
-               ▼
-┌─────────────────────────────────────────┐
-│  Frontend (HTML + Chart.js)             │
-│  - Stability ranking table              │
-│  - Radar chart (5-axis evaluation)      │
-│  - Speed trend chart (30 days)          │
-└─────────────────────────────────────────┘
-
-         ┌──────────────────┐
-         │  Twitter API     │
-         │  - OAuth 1.0a    │
-         │  - 3x daily posts│
-         └──────────────────┘
-```
-
----
-
-## 📂 Project Structure
-
-```
-vpn-stability-ranking/
-├── gas/
-│   ├── vpn-speed-tracker-v3.1.gs      # Main measurement script
-│   └── twitter-oauth1-fixed.gs        # Twitter bot
-├── frontend/
-│   ├── vpn-stability-ranking.html     # Main dashboard
-│   └── vpn-stability-widget.html      # Embeddable widget
-├── docs/
-│   ├── API.md                         # API documentation
-│   ├── DEPLOYMENT.md                  # Deployment guide
-│   └── STABILITY_CALCULATION.md       # Stability score algorithm
-├── README.md
-└── README_ja.md
-```
-
----
-
-## 🚀 Quick Start
-
-### Prerequisites
-- Google Account
-- Twitter Developer Account (for bot feature)
-
-### 1. Setup Google Sheets
-
-Create a new Google Sheet with the following structure:
-
-**Sheet: `地域別データ`**
-| タイムスタンプ | 地域 | VPNサービス | ダウンロード(Mbps) | アップロード(Mbps) | Ping(ms) | 安定性スコア | 信頼性(%) | 総合スコア | ランク |
-|---|---|---|---|---|---|---|---|---|---|
-
-### 2. Deploy Google Apps Script
-
-1. Open Google Sheets → **Extensions → Apps Script**
-2. Copy contents from `gas/vpn-speed-tracker-v3.1.gs`
-3. Paste into Code.gs
-4. Run `initialSetup()` to initialize
-5. **Deploy → New deployment**
-   - Type: Web app
-   - Execute as: Me
-   - Who has access: Anyone
-6. Copy the Web App URL
-
-### 3. Setup Frontend
-
-1. Update `API_URL` in HTML files:
-```javascript
-const API_URL = 'YOUR_WEB_APP_URL';
-```
-
-2. Upload HTML files to your web server
-
-### 4. Setup Twitter Bot (Optional)
-
-1. Get Twitter API credentials:
-   - API Key & Secret
-   - Access Token & Secret
-
-2. Copy `gas/twitter-oauth1-fixed.gs` to Apps Script
-
-3. Set Script Properties:
-```javascript
-Properties.setScriptProperties({
-  'TWITTER_API_KEY': 'your_api_key',
-  'TWITTER_API_SECRET': 'your_api_secret',
-  'TWITTER_ACCESS_TOKEN': 'your_access_token',
-  'TWITTER_ACCESS_TOKEN_SECRET': 'your_access_token_secret'
-});
-```
-
-4. Run `setupTwitterTriggers()` to schedule tweets
-
----
-
-## 📊 Stability Score Calculation
-
-The stability score is calculated from 30 days of historical data:
-
-```
-Stability Score = 
-  (Speed Stability × 40%) + 
-  (Ping Stability × 30%) + 
-  (Reliability × 30%)
-```
-
-**Where:**
-- **Speed Stability**: `100 - (stdDev / avgSpeed × 100)`
-- **Ping Stability**: `100 - (stdDev / avgPing × 50)`
-- **Reliability**: Connection success rate (%)
-
-See [STABILITY_CALCULATION.md](./docs/STABILITY_CALCULATION.md) for details.
-
----
-
-## 🌍 API Endpoints
-
-### Get Stability Ranking
-```
-GET /exec?type=stability&region=JP
-```
-
-**Response:**
-```json
-{
-  "region": "JP",
-  "regionName": "日本（東京）",
-  "lastUpdate": "2025-12-07T10:00:00Z",
-  "data": [
-    {
-      "name": "NordVPN",
-      "stabilityScore": 98.5,
-      "avgSpeed": 480,
-      "speedStdDev": 12,
-      "avgPing": 12.5,
-      "pingStdDev": 1.2,
-      "reliability": 98.0,
-      "dataPoints": 120
-    }
-  ]
-}
-```
-
-### Get Radar Chart Data
-```
-GET /exec?type=radar&region=US
-```
-
-**Response:**
-```json
-{
-  "region": "US",
-  "data": [
-    {
-      "name": "NordVPN",
-      "scores": {
-        "speed": 95,
-        "stability": 98,
-        "regional": 92,
-        "ping": 94,
-        "reliability": 99
-      }
-    }
-  ]
-}
-```
-
-### Get Speed Trend
-```
-GET /exec?type=trend&vpn=NordVPN&region=UK
-```
-
-**Response:**
-```json
-{
-  "vpn": "NordVPN",
-  "region": "UK",
-  "data": [
-    {
-      "date": "2025-12-01 10:00",
-      "speed": 485
-    },
-    {
-      "date": "2025-12-01 16:00",
-      "speed": 478
-    }
-  ]
-}
-```
-
-See [API.md](./docs/API.md) for full documentation.
-
----
-
-## 🎨 Widget Embedding
-
-Embed the stability ranking on your website:
-
-```html
-<iframe 
-  src="https://www.blstweb.jp/network/vpn-stability-ranking/widget/" 
-  width="100%" 
-  height="550"
-  frameborder="0"
-  scrolling="no">
-</iframe>
-```
-
----
-
-## 🤖 Twitter Bot
-
-The bot posts stability rankings 3 times daily (10:00, 15:00, 20:00 JST):
-
-```
-📊 VPN安定性ランキング（日本）
-
-🥇 NordVPN: 98.5
-   速度: 480 Mbps ±12
-
-🥈 ExpressVPN: 97.2
-   速度: 450 Mbps ±18
-
-🥉 Surfshark: 94.8
-   速度: 390 Mbps ±25
-
-詳細▶️ https://www.blstweb.jp/network/vpn/vpn-stability-ranking/
-```
-
----
-
-## 💰 Cost
-
-**$0/month** - Everything runs on free tiers:
-
-| Service | Cost |
-|---------|------|
-| Google Apps Script | Free |
-| Google Sheets | Free |
-| Chart.js | Free (Open Source) |
-| Twitter API | Free (Free Tier) |
-| **Total** | **$0/month** |
-
----
+- **VPNs Monitored:** 15 services
+- **Measurements Collected:** 645+ tests
+- **Update Frequency:** Every 6 hours
+- **Monitoring Period:** 2 weeks (ongoing)
+- **Location:** Tokyo, Japan
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Google Apps Script
-- **Database**: Google Sheets
-- **API**: Apps Script Web Apps
-- **Frontend**: HTML + Vanilla JavaScript
-- **Charts**: Chart.js 4.4.0
-- **Twitter**: Twitter API v2 (OAuth 1.0a)
-- **Hosting**: WordPress (self-hosted)
+- **Backend:** Google Apps Script
+- **Data Storage:** Google Spreadsheet
+- **Frontend:** HTML/CSS/JavaScript
+- **APIs:** ScraperAPI (pricing), Google News RSS
+- **Notifications:** Twitter API (OAuth 1.0a)
 
----
+## 📦 Components
 
-## 📈 Roadmap
+### 1. VPN Speed Tracker
+Automated speed testing system that measures download/upload speeds, ping, and calculates stability scores.
 
-### Short-term (1 month)
-- [x] Multi-region support (4 regions)
-- [x] Stability analysis
-- [x] Radar charts
-- [ ] Complete GitHub documentation
-- [ ] Publish to Product Hunt
+**File:** `gas/vpn-speed-tracker.gs`
 
-### Mid-term (3 months)
-- [ ] VPN outage detection bot
-- [ ] Price tracking system
-- [ ] Kaggle dataset publication
+**Features:**
+- Tests 15 VPNs every 6 hours
+- Calculates stability score based on variation
+- Tracks historical performance
+- Provides Web App API endpoint
 
-### Long-term (6 months)
-- [ ] Open-source VPN evaluation framework
-- [ ] Community-driven evaluation platform
-- [ ] Browser extension
+### 2. Price Monitoring System
+Daily price scraping with automatic change detection and alerts.
 
----
+**Files:** 
+- `gas/price-scraper.gs` - Scrapes VPN pricing
+- `gas/price-alert.gs` - Detects price changes (5%+ threshold)
+
+**Features:**
+- Daily price updates
+- 5%+ change detection
+- Twitter auto-posting
+- Historical price tracking
+
+### 3. Outage Detection
+Advanced outage detection based on statistical analysis.
+
+**File:** `gas/outage-detector.gs`
+
+**Features:**
+- Historical average comparison
+- Relative performance analysis
+- Consecutive anomaly confirmation
+- Auto-alert system
+
+### 4. VPN Diagnosis Tool
+Client-side security diagnostic tool for VPN leak detection.
+
+**File:** `frontend/vpn-diagnosis-tool.html`
+
+**Features:**
+- IP address display
+- DNS leak detection
+- WebRTC leak detection
+- IPv6 leak detection
+- IP history comparison
+
+### 5. Market Report Generator
+Quarterly VPN market analysis report with statistics and forecasts.
+
+**File:** `gas/market-report.gs`
+
+**Features:**
+- Speed statistics analysis
+- Price trend analysis
+- Reliability metrics
+- Future forecasts
+- PDF export (Google Docs)
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Google Account (for Google Apps Script)
+- Twitter Developer Account (optional, for auto-posting)
+- ScraperAPI Account (optional, for price scraping)
+
+### Installation
+
+1. **Clone this repository**
+   ```bash
+   git clone https://github.com/yourusername/vpn-stability-ranking.git
+   cd vpn-stability-ranking
+   ```
+
+2. **Set up Google Apps Script**
+   - Create a new Google Spreadsheet
+   - Extensions → Apps Script
+   - Copy files from `gas/` folder
+   - Copy `gas/config.example.gs` to `config.gs` and fill in your settings
+
+3. **Configure Spreadsheet**
+   - Create sheets: `速度データ`, `VPN料金履歴`, `VPN障害検知（高度）`, `VPNニュース履歴`
+   - Copy Spreadsheet ID to `config.gs`
+
+4. **Set up Triggers**
+   - Speed tracker: Every 6 hours
+   - Price scraper: Daily at 9:00 AM
+   - Outage detector: Hourly
+   - News monitor: Every 6 hours
+
+5. **Deploy VPN Diagnosis Tool**
+   - Upload `frontend/vpn-diagnosis-tool.html` to your website
+   - Or open directly in browser
+
+### Configuration
+
+Edit `gas/config.gs`:
+
+```javascript
+const CONFIG = {
+  SPREADSHEET_ID: 'your-spreadsheet-id',
+  TWITTER_API_KEY: 'your-api-key',  // Optional
+  SCRAPER_API_KEY: 'your-api-key',  // Optional
+  TIMEZONE: 'Asia/Tokyo'
+};
+```
+
+## 📊 Monitored VPNs
+
+1. NordVPN
+2. ExpressVPN
+3. Private Internet Access (PIA)
+4. Surfshark
+5. MillenVPN
+6. CyberGhost
+7. ProtonVPN
+8. Mullvad
+9. IPVanish
+10. Hotspot Shield
+11. TunnelBear
+12. Windscribe
+13. HideMyAss
+14. セカイVPN
+15. AtlasVPN
+
+## 📈 Sample Output
+
+### Speed Ranking (JSON)
+```json
+{
+  "timestamp": "2025-12-20T19:00:00+09:00",
+  "rankings": [
+    {
+      "rank": 1,
+      "vpn": "NordVPN",
+      "avgSpeed": 460,
+      "stability": 95.2,
+      "totalScore": 97.8
+    }
+  ]
+}
+```
+
+### Diagnosis Tool Result
+```json
+{
+  "ip": "203.0.113.1",
+  "isp": "Example ISP",
+  "country": "JP",
+  "dnsLeak": false,
+  "webrtcLeak": false,
+  "ipv6Leak": false
+}
+```
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details.
+
+### How to Contribute
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
@@ -354,34 +206,37 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
----
-
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
----
-
 ## 🙏 Acknowledgments
 
-- [Chart.js](https://www.chartjs.org/) - Beautiful charts
-- [Google Apps Script](https://developers.google.com/apps-script) - Serverless automation
-- [Twitter API](https://developer.twitter.com/) - Social media integration
+- Speed testing methodology inspired by VPN comparison sites
+- Stability calculation based on statistical analysis
+- Community feedback and contributions
+
+## 📞 Contact
+
+- **Website:** https://www.blstweb.jp/
+- **Twitter:** [@blstweb](https://twitter.com/blstweb)
+- **Issues:** [GitHub Issues](https://github.com/yourusername/vpn-stability-ranking/issues)
+
+## 📚 Documentation
+
+- [Setup Guide](docs/SETUP.md)
+- [API Documentation](docs/API.md)
+- [Deployment Guide](docs/DEPLOYMENT.md)
+- [Stability Calculation](docs/STABILITY_CALCULATION.md)
+
+## 🌟 Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/vpn-stability-ranking&type=Date)](https://star-history.com/#yourusername/vpn-stability-ranking&Date)
 
 ---
 
-## 📮 Contact
+**Note:** This system is for educational and research purposes. VPN performance varies by location, time, and network conditions. Results are specific to Tokyo, Japan testing environment.
 
-- Website: [blstweb.jp](https://www.blstweb.jp)
-- Twitter: [@remoteaccessvpn](https://twitter.com/remoteaccessvpn)
-- Issues: [GitHub Issues](https://github.com/hmy0210/vpn-stability-ranking/issues)
+**Data Update:** Every 6 hours automatically
 
----
-
-## ⭐ Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=hmy0210/vpn-stability-ranking&type=Date)](https://star-history.com/#hmy0210/vpn-stability-ranking&Date)
-
----
-
-**Made with ❤️ by [hmy0210](https://github.com/hmy0210)**
+**Last Updated:** December 2025
