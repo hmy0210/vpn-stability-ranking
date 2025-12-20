@@ -1,0 +1,184 @@
+<!-- ============================================ -->
+<!-- VPNウィジェット HTML部分のみ（スクリプトなし）  -->
+<!-- 各ウィジェットを記事内の好きな場所に配置      -->
+<!-- ============================================ -->
+
+<!-- ==========================================
+     1. VPN診断ツール
+     ========================================== -->
+<div id="vpn-diagnosis-widget">
+  <div class="container">
+    <div class="header">
+      <h1>&#x1f3af; VPN診断ツール</h1>
+      <p>3つの質問であなたに最適なVPNを見つけます</p>
+    </div>
+    
+    <div class="content">
+      <div id="loading" class="loading">
+        <div class="loading-spinner"></div>
+        <p>最新のVPNデータを読み込み中...</p>
+      </div>
+      
+      <div id="questions" style="display: none;">
+        <div class="progress-bar">
+          <div class="progress-fill" id="progressFill" style="width: 0%"></div>
+        </div>
+        
+        <div class="question-card active" data-question="1">
+          <div class="question-title">Q1. VPNの主な用途は？</div>
+          <div class="options">
+            <button class="option-btn" onclick="selectDiagnosisAnswer('purpose', 'streaming')">
+              <div class="option-title">&#x1f3ac; 動画ストリーミング</div>
+              <div class="option-desc">Netflix、Disney+、海外コンテンツ視聴</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('purpose', 'gaming')">
+              <div class="option-title">&#x1f3ae; オンラインゲーム</div>
+              <div class="option-desc">低Ping、安定した接続が重要</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('purpose', 'torrenting')">
+              <div class="option-title">&#x1f4c1; ファイル共有・P2P</div>
+              <div class="option-desc">トレント、大容量ファイルのダウンロード</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('purpose', 'privacy')">
+              <div class="option-title">&#x1f512; プライバシー保護</div>
+              <div class="option-desc">匿名性、ログなし、厳格なセキュリティ</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('purpose', 'security')">
+              <div class="option-title">&#x1f6e1;&#xfe0f; セキュリティ重視</div>
+              <div class="option-desc">公共Wi-Fi、ビジネス利用、安全性</div>
+            </button>
+          </div>
+        </div>
+        
+        <div class="question-card" data-question="2">
+          <div class="question-title">Q2. 最も重視するポイントは？</div>
+          <div class="options">
+            <button class="option-btn" onclick="selectDiagnosisAnswer('priority', 'speed')">
+              <div class="option-title">&#x26a1; 速度</div>
+              <div class="option-desc">とにかく速い通信速度を求める</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('priority', 'stability')">
+              <div class="option-title">&#x1f4ca; 安定性</div>
+              <div class="option-desc">速度のブレが少なく、常に安定</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('priority', 'price')">
+              <div class="option-title">&#x1f4b0; 価格</div>
+              <div class="option-desc">コストパフォーマンス重視</div>
+            </button>
+          </div>
+        </div>
+        
+        <div class="question-card" data-question="3">
+          <div class="question-title">Q3. 月額予算は？</div>
+          <div class="options">
+            <button class="option-btn" onclick="selectDiagnosisAnswer('budget', 'cheap')">
+              <div class="option-title">&#x1f4b5; 500円以下</div>
+              <div class="option-desc">できるだけ安く抑えたい</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('budget', 'mid')">
+              <div class="option-title">&#x1f4b3; 500〜900円</div>
+              <div class="option-desc">標準的な価格帯</div>
+            </button>
+            <button class="option-btn" onclick="selectDiagnosisAnswer('budget', 'premium')">
+              <div class="option-title">&#x1f48e; 900円以上</div>
+              <div class="option-desc">品質重視、価格は気にしない</div>
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div id="result" class="result-card">
+        <div id="topResult"></div>
+        
+        <div class="alternatives-section">
+          <div class="alternatives-title">&#x1f4cb; その他の候補</div>
+          <div id="alternativesList"></div>
+        </div>
+        
+        <div class="data-source">
+          <p>&#x1f4ca; このデータは<strong>リアルタイム実測値</strong>に基づいています</p>
+          <p class="data-timestamp" id="dataTimestamp">最終更新: 2025-12-13 10:00</p>
+        </div>
+        
+        <div style="text-align: center;">
+          <button class="restart-btn" onclick="restartDiagnosis()">もう一度診断する</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ==========================================
+     2. VPN速度ランキング TOP5
+     ========================================== -->
+<div id="vpn-speed-widget">
+  <div class="speed-header">
+    <div class="speed-title">&#x26a1; VPN速度ランキング TOP5</div>
+    <div class="speed-subtitle">リアルタイム実測データ（6時間ごと自動更新）</div>
+  </div>
+  
+  <div class="loading">
+    <div class="loading-spinner"></div>
+    <p>データ読み込み中...</p>
+  </div>
+  
+  <div class="speed-container" style="display: none;"></div>
+  <div class="update-time" style="display: none;"></div>
+</div>
+
+<!-- ==========================================
+     3. VPN料金比較（円換算）
+     ========================================== -->
+<div id="vpn-pricing-widget">
+  <div class="pricing-header">
+    <div class="pricing-title">&#x1f4b0; VPN最安値 TOP5（円換算）</div>
+    <div class="pricing-subtitle">公式サイトから最新料金を取得中...</div>
+  </div>
+  
+  <div class="loading" id="vpnPricingLoading">
+    <div class="loading-spinner"></div>
+    <div class="loading-text">最新の料金データと為替レートを取得しています...</div>
+  </div>
+  
+  <div class="pricing-container" id="vpnPricingContainer">
+    <div class="pricing-list" id="vpnPricingList"></div>
+  </div>
+  
+  <div class="error-message" id="vpnPricingError">
+    &#x26a0;&#xfe0f; 料金データの取得に失敗しました。しばらくしてから再度お試しください。
+  </div>
+  
+  <div class="notice" id="vpnPricingNotice">
+    &#x26a0;&#xfe0f; 外貨建て料金は最新の為替レートで円換算しています。実際の請求額は為替変動により異なる場合があります。
+  </div>
+  
+  <div class="update-info" id="vpnPricingUpdate"></div>
+  <div class="exchange-info" id="vpnExchangeInfo"></div>
+</div>
+
+<!-- ==========================================
+     4. 用途別おすすめVPN TOP3
+     ========================================== -->
+<div id="vpn-usecase-widget">
+  <div class="usecase-tabs">
+    <button class="tab-btn active" onclick="switchUseCaseTab('streaming')">
+      &#x1f3ac; ストリーミング
+    </button>
+    <button class="tab-btn" onclick="switchUseCaseTab('gaming')">
+      &#x1f3ae; ゲーミング
+    </button>
+    <button class="tab-btn" onclick="switchUseCaseTab('privacy')">
+      &#x1f512; プライバシー
+    </button>
+    <button class="tab-btn" onclick="switchUseCaseTab('torrenting')">
+      &#x1f4e5; トレント
+    </button>
+  </div>
+  
+  <div class="loading">データ読み込み中...</div>
+  
+  <div id="streaming-content" class="usecase-content"></div>
+  <div id="gaming-content" class="usecase-content"></div>
+  <div id="privacy-content" class="usecase-content"></div>
+  <div id="torrenting-content" class="usecase-content"></div>
+</div>
