@@ -217,7 +217,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 ## 📞 Contact
 
 - **Website:** https://www.blstweb.jp/
-- **Twitter:** [@blstweb](https://twitter.com/blstweb)
+- **Twitter:** [@remoteaccessvpn](https://twitter.com/remoteaccessvpn)
 - **Issues:** [GitHub Issues](https://github.com/yourusername/vpn-stability-ranking/issues)
 
 ## 📚 Documentation
