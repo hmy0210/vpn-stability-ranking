@@ -6,7 +6,7 @@ Real-time VPN speed and stability monitoring system from Tokyo, Japan.
 
 Automated VPN performance monitoring system that tests 15 major VPN services every 6 hours from Tokyo. Provides real-time speed rankings, stability scores, and security diagnostics.
 
-**Live Demo:** https://www.blstweb.jp/network/vpn/
+**Live Demo:** [https://www.blstweb.jp/network/vpn/](https://www.blstweb.jp/network/vpn/)
 
 ### Key Features
 
@@ -216,7 +216,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Contact
 
-- **Website:** https://www.blstweb.jp/
+- **Website:** [https://www.blstweb.jp/](https://www.blstweb.jp/)
 - **Twitter:** [@remoteaccessvpn](https://twitter.com/remoteaccessvpn)
 - **Issues:** [GitHub Issues](https://github.com/yourusername/vpn-stability-ranking/issues)
 
@@ -226,10 +226,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [API Documentation](docs/API.md)
 - [Deployment Guide](docs/DEPLOYMENT.md)
 - [Stability Calculation](docs/STABILITY_CALCULATION.md)
-
-## 🌟 Star History
-
-[![Star History Chart](https://api.star-history.com/svg?repos=yourusername/vpn-stability-ranking&type=Date)](https://star-history.com/#yourusername/vpn-stability-ranking&Date)
 
 ---
 
