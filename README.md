@@ -226,6 +226,22 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [Deployment Guide](docs/DEPLOYMENT.md)
 - [Stability Calculation](docs/STABILITY_CALCULATION.md)
 
+## 📄 Publication
+
+Hamaya, T. (2026). *Tokyo VPN Speed Monitor: A Longitudinal Open Dataset of VPN Performance Metrics in Japan*. Zenodo. https://doi.org/10.5281/zenodo.18207135
+
+## 📊 Data Availability
+
+| Repository | DOI |
+|------------|-----|
+| Harvard Dataverse | [10.7910/DVN/OMC9A4](https://doi.org/10.7910/DVN/OMC9A4) |
+| Zenodo | [10.5281/zenodo.18091751](https://doi.org/10.5281/zenodo.18091751) |
+| IEEE DataPort | [10.21227/9ej5-dp09](https://doi.org/10.21227/9ej5-dp09) |
+| Kaggle | [10.34740/kaggle/dsv/14451497](https://doi.org/10.34740/kaggle/dsv/14451497) |
+| figshare | [10.6084/m9.figshare.30969004](https://doi.org/10.6084/m9.figshare.30969004) |
+| OSF | [10.17605/OSF.IO/VNCDH](https://doi.org/10.17605/OSF.IO/VNCDH) |
+| Mendeley Data | [10.17632/hysp9jzg5h.2](https://doi.org/10.17632/hysp9jzg5h.2) |
+
 ---
 
 **Note:** This system is for educational and research purposes. VPN performance varies by location, time, and network conditions. Results are specific to Tokyo, Japan testing environment.
