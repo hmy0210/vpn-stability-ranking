@@ -1,195 +1,390 @@
-# 🚀 Tokyo VPN Speed Monitor
+# 🚀 Tokyo VPN Speed Monitor v2.0
 
-Real-time VPN speed and stability monitoring system from Tokyo, Japan.
+Real-time VPN speed, stability, and **trust score** monitoring system from Tokyo, Japan.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![DOI](https://img.shields.io/badge/DOI-10.7910%2FDVN%2FOMC9A4-blue)](https://doi.org/10.7910/DVN/OMC9A4)
+[![Twitter](https://img.shields.io/twitter/follow/remoteaccessvpn?style=social)](https://twitter.com/remoteaccessvpn)
+
+---
 
 ## 📊 Overview
 
-Automated VPN performance monitoring system that tests 15 major VPN services every 6 hours from Tokyo. Provides real-time speed rankings, stability scores, and security diagnostics.
+Automated VPN performance monitoring system that tests **15 major VPN services** every 6 hours from Tokyo. Now with **Trust Score** - a comprehensive privacy and transparency evaluation.
 
-**Live Demo:** [https://www.blstweb.jp/network/vpn/tokyo-vpn-speed-monitor/](https://www.blstweb.jp/network/vpn/tokyo-vpn-speed-monitor/)
+**Live Demo:** https://www.blstweb.jp/network/vpn/tokyo-vpn-speed-monitor/
 
-### Key Features
+### What's New in v2.0
 
-- ✅ **Automated Testing** - Tests 15 VPNs every 6 hours (4 times daily)
-- 📊 **Real-time Rankings** - Live speed and stability rankings
-- 🔍 **Security Diagnostics** - DNS leak, WebRTC leak, IPv6 leak detection
-- 💰 **Price Monitoring** - Daily price tracking with change alerts
-- 📰 **News Monitoring** - VPN-related news aggregation
-- 📈 **Quarterly Reports** - Automated market analysis reports
-- 🐦 **Auto Posting** - Twitter alerts for price changes and outages
+- 🔒 **Trust Score** - 10-item privacy & transparency evaluation
+- 📊 **Quarterly Market Reports** - Automated industry analysis with PDF export
+- 🐦 **Enhanced Twitter Integration** - Speed rankings + Trust score updates
+- 📰 **Improved News Monitoring** - Stricter filtering for relevance
 
-### Current Stats
+---
 
-- **VPNs Monitored:** 15 services
-- **Measurements Collected:** 1950+ tests
-- **Update Frequency:** Every 6 hours
-- **Location:** Tokyo, Japan
+## 🏗️ System Architecture
+
+```
+┌─────────────────────────────────────────────────────────────────────────┐
+│                    Tokyo VPN Speed Monitor v2.0                         │
+├─────────────────────────────────────────────────────────────────────────┤
+│                                                                         │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
+│  │  Engine 1   │  │  Engine 2a  │  │  Engine 2b  │  │  Engine 2b+ │   │
+│  │   Speed     │  │   Price     │  │   Outage    │  │    News     │   │
+│  │  Tracker    │  │  Scraper    │  │  Detector   │  │   Monitor   │   │
+│  │  (6h)       │  │  (Daily)    │  │  (1h)       │  │   (6h)      │   │
+│  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘   │
+│         │                │                │                │           │
+│         └────────────────┼────────────────┼────────────────┘           │
+│                          │                │                             │
+│                          ▼                ▼                             │
+│                 ┌─────────────────────────────────┐                    │
+│                 │      Google Spreadsheet         │                    │
+│                 │    (Central Data Storage)       │                    │
+│                 └─────────────┬───────────────────┘                    │
+│                               │                                         │
+│         ┌─────────────────────┼─────────────────────┐                  │
+│         │                     │                     │                  │
+│         ▼                     ▼                     ▼                  │
+│  ┌─────────────┐       ┌─────────────┐       ┌─────────────┐          │
+│  │  Engine 8   │       │   Twitter   │       │  MailPoet   │          │
+│  │  Quarterly  │       │ Integration │       │   Weekly    │          │
+│  │   Report    │       │  (Auto)     │       │  Digest     │          │
+│  └─────────────┘       └─────────────┘       └─────────────┘          │
+│                                                                         │
+│  ┌─────────────────────────────────────────────────────────────────┐   │
+│  │                    🔒 Trust Score API                           │   │
+│  │    Separate Spreadsheet → Web API → Integration with all engines │   │
+│  └─────────────────────────────────────────────────────────────────┘   │
+│                                                                         │
+└─────────────────────────────────────────────────────────────────────────┘
+```
+
+---
+
+## 📦 Engine Components
+
+| Engine | Function | Frequency | Output |
+|--------|----------|-----------|--------|
+| **1** | VPN Speed Measurement | Every 6 hours | Speed ranking, stability score |
+| **2a** | Price Scraping | Daily 9:00 AM | Price data, change alerts |
+| **2a+** | Price Alert | On price change | Twitter notification |
+| **2b** | Outage Detection | Hourly | Anomaly detection |
+| **2b+** | News Monitoring | Every 6 hours | Filtered VPN news |
+| **Twitter** | Auto Posting | 10:00, 15:00, 20:00 | Speed ranking tweets |
+| **MailPoet** | Weekly Digest | Monday 9:00 AM | Newsletter content |
+| **8** | Market Report | Quarterly | PDF report with statistics |
+| **Trust** | Trust Score API | Monthly update | Privacy evaluation |
+
+---
+
+## 🔒 Trust Score Methodology
+
+Trust Score evaluates VPN providers on **10 privacy and transparency criteria**:
+
+| Category | Item | Max Points |
+|----------|------|------------|
+| **Privacy** | No-Log Policy | 15 |
+| | Third-Party Audit | 15 |
+| | Transparency Report | 10 |
+| **Legal** | Jurisdiction | 10 |
+| | Data Retention | 10 |
+| | Legal Response History | 5 |
+| **Technical** | Open Source | 10 |
+| | RAM-Only Servers | 10 |
+| | Incident Response | 10 |
+| **Track Record** | Operating Years | 5 |
+| | **Total** | **100** |
+
+### Grade Scale
+
+| Grade | Score | Meaning |
+|-------|-------|---------|
+| **A** | 85-100 | Excellent privacy practices |
+| **B** | 70-84 | Good privacy practices |
+| **C** | 55-69 | Average, room for improvement |
+| **D** | 40-54 | Below average |
+| **F** | 0-39 | Poor privacy practices |
+
+---
+
+## 📊 Monitored VPNs (15 Services)
+
+| VPN | Speed Tracking | Price Tracking | Trust Score |
+|-----|----------------|----------------|-------------|
+| NordVPN | ✅ | ✅ | ✅ |
+| ExpressVPN | ✅ | ✅ | ✅ |
+| Private Internet Access | ✅ | ✅ | ✅ |
+| Surfshark | ✅ | ✅ | ✅ |
+| MillenVPN | ✅ | ✅ | ✅ |
+| CyberGhost | ✅ | ✅ | ✅ |
+| ProtonVPN | ✅ | ✅ | ✅ |
+| Mullvad | ✅ | ✅ | ✅ |
+| IPVanish | ✅ | ✅ | ✅ |
+| Hotspot Shield | ✅ | ✅ | ✅ |
+| TunnelBear | ✅ | ✅ | ✅ |
+| Windscribe | ✅ | ✅ | ✅ |
+| HideMyAss | ✅ | ✅ | ✅ |
+| セカイVPN | ✅ | ✅ | ✅ |
+| Planet VPN | ✅ | ✅ | ✅ |
+
+---
 
 ## 🛠️ Tech Stack
 
-- **Backend:** Google Apps Script
+- **Backend:** Google Apps Script (JavaScript)
 - **Data Storage:** Google Spreadsheet
 - **Frontend:** HTML/CSS/JavaScript
-- **APIs:** ScraperAPI (pricing), Google News RSS
-- **Notifications:** Twitter API (OAuth 1.0a)
+- **External APIs:**
+  - ScraperAPI (price scraping)
+  - Twitter API v2 (OAuth 1.0a)
+  - Google News RSS
+- **Output:** Web API (JSON), PDF Reports
 
-## 📦 Components
+---
 
-### 1. VPN Speed Tracker
-Automated speed testing system that measures download/upload speeds, ping, and calculates stability scores.
+## 📁 Repository Structure
 
-**File:** `gas/vpn-speed-tracker.gs`
+```
+vpn-stability-ranking/
+├── gas/
+│   ├── vpn-speed-tracker.gs        # Engine 1: Speed measurement
+│   ├── price-scraper.gs            # Engine 2a: Price scraping
+│   ├── price-alert.gs              # Engine 2a+: Price change alerts
+│   ├── outage-detector.gs          # Engine 2b: Outage detection
+│   ├── news-monitor.gs             # Engine 2b+: News monitoring
+│   ├── twitter-integrated.gs       # Twitter posting (speed + trust)
+│   ├── mailpoet-digest.gs          # Weekly newsletter digest
+│   ├── engine8-market-report.gs    # Quarterly market report
+│   ├── trust-score-api.gs          # Trust Score API (separate project)
+│   └── config.example.gs           # Configuration template
+├── frontend/
+│   ├── vpn-diagnosis-tool.html     # Client-side VPN leak test
+│   └── speed-widget.html           # Embeddable speed ranking widget
+├── docs/
+│   ├── SETUP.md                    # Installation guide
+│   ├── API.md                      # API documentation
+│   ├── DEPLOYMENT.md               # Deployment instructions
+│   ├── STABILITY_CALCULATION.md    # Stability score methodology
+│   └── TRUST_SCORE_METHODOLOGY.md  # Trust score evaluation criteria
+├── CONTRIBUTING.md
+├── LICENSE
+└── README.md
+```
 
-**Features:**
-- Tests 15 VPNs every 6 hours
-- Calculates stability score based on variation
-- Tracks historical performance
-- Provides Web App API endpoint
-
-### 2. Price Monitoring System
-Daily price scraping with automatic change detection and alerts.
-
-**Files:** 
-- `gas/price-scraper.gs` - Scrapes VPN pricing
-- `gas/price-alert.gs` - Detects price changes (5%+ threshold)
-
-**Features:**
-- Daily price updates
-- 5%+ change detection
-- Twitter auto-posting
-- Historical price tracking
-
-### 3. Outage Detection
-Advanced outage detection based on statistical analysis.
-
-**File:** `gas/outage-detector.gs`
-
-**Features:**
-- Historical average comparison
-- Relative performance analysis
-- Consecutive anomaly confirmation
-- Auto-alert system
-
-### 4. VPN Diagnosis Tool
-Client-side security diagnostic tool for VPN leak detection.
-
-**File:** `frontend/vpn-diagnosis-tool.html`
-
-**Features:**
-- IP address display
-- DNS leak detection
-- WebRTC leak detection
-- IPv6 leak detection
-- IP history comparison
-
-### 5. Market Report Generator
-Quarterly VPN market analysis report with statistics and forecasts.
-
-**File:** `gas/market-report.gs`
-
-**Features:**
-- Speed statistics analysis
-- Price trend analysis
-- Reliability metrics
-- Future forecasts
-- PDF export (Google Docs)
+---
 
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-- Google Account (for Google Apps Script)
+- Google Account (required)
 - Twitter Developer Account (optional, for auto-posting)
 - ScraperAPI Account (optional, for price scraping)
 
-### Installation
+### Quick Start
 
-1. **Clone this repository**
+1. **Clone the repository**
    ```bash
-   git clone https://github.com/yourusername/vpn-stability-ranking.git
+   git clone https://github.com/hmy0210/vpn-stability-ranking.git
    cd vpn-stability-ranking
    ```
 
 2. **Set up Google Apps Script**
    - Create a new Google Spreadsheet
-   - Extensions → Apps Script
+   - Go to Extensions → Apps Script
    - Copy files from `gas/` folder
-   - Copy `gas/config.example.gs` to `config.gs` and fill in your settings
+   - Configure `config.gs` with your settings
 
-3. **Configure Spreadsheet**
-   - Create sheets: `速度データ`, `VPN料金履歴`, `VPN障害検知（高度）`, `VPNニュース履歴`
-   - Copy Spreadsheet ID to `config.gs`
+3. **Create required sheets**
+   - `速度データ` (Speed Data)
+   - `VPN料金履歴` (Price History)
+   - `VPN障害検知（高度）` (Outage Detection)
+   - `VPNニュース履歴` (News History)
+   - `トラストスコア` (Trust Score)
+   - `VPN業界統計レポート` (Market Report)
 
-4. **Set up Triggers**
-   - Speed tracker: Every 6 hours
-   - Price scraper: Daily at 9:00 AM
-   - Outage detector: Hourly
-   - News monitor: Every 6 hours
+4. **Set up triggers**
+   | Function | Schedule |
+   |----------|----------|
+   | `measureAllVPNs` | Every 6 hours |
+   | `scrapePricingAndCheckAlerts` | Daily 9:00 AM |
+   | `detectAdvancedOutages` | Hourly |
+   | `monitorVPNNews` | Every 6 hours |
+   | `generateAndPostSpeedTweet` | 10:00, 15:00, 20:00 |
+   | `postTrustScoreUpdateTweet` | Monthly 1st, 11:00 |
+   | `generateWeeklyDigest` | Monday 9:00 AM |
+   | `checkAndGenerateQuarterlyReport` | Quarterly 1st, 9:00 |
 
-5. **Deploy VPN Diagnosis Tool**
-   - Upload `frontend/vpn-diagnosis-tool.html` to your website
-   - Or open directly in browser
+5. **Deploy Web App**
+   - Deploy → New deployment → Web app
+   - Execute as: Me
+   - Who has access: Anyone
 
-### Configuration
+---
 
-Edit `gas/config.gs`:
+## 📡 API Reference
 
-```javascript
-const CONFIG = {
-  SPREADSHEET_ID: 'your-spreadsheet-id',
-  TWITTER_API_KEY: 'your-api-key',  // Optional
-  SCRAPER_API_KEY: 'your-api-key',  // Optional
-  TIMEZONE: 'Asia/Tokyo'
-};
+### Speed Ranking API
+
+```
+GET /?type=ranking&region=JP
 ```
 
-## 📊 Monitored VPNs
-
-1. NordVPN
-2. ExpressVPN
-3. Private Internet Access (PIA)
-4. Surfshark
-5. MillenVPN
-6. CyberGhost
-7. ProtonVPN
-8. Mullvad
-9. IPVanish
-10. Hotspot Shield
-11. TunnelBear
-12. Windscribe
-13. HideMyAss
-14. セカイVPN
-15. AtlasVPN
-
-## 📈 Sample Output
-
-### Speed Ranking (JSON)
+**Response:**
 ```json
 {
-  "timestamp": "2025-12-20T19:00:00+09:00",
-  "rankings": [
+  "lastUpdate": "2026-01-21T10:00:00+09:00",
+  "region": "JP",
+  "regionName": "日本（東京）",
+  "vpnCount": 15,
+  "data": [
     {
       "rank": 1,
-      "vpn": "NordVPN",
-      "avgSpeed": 460,
+      "name": "NordVPN",
+      "download": 485.2,
+      "upload": 312.5,
+      "ping": 12.3,
       "stability": 95.2,
-      "totalScore": 97.8
+      "totalScore": 97.8,
+      "stabilityScore7d": 94.5
     }
   ]
 }
 ```
 
-### Diagnosis Tool Result
+### Stability Score API
+
+```
+GET /?type=stability
+```
+
+### Price Data API
+
+```
+GET /?action=getPricing
+```
+
+### Trust Score API
+
+```
+GET ?action=getTrustScores
+```
+
+**Response:**
 ```json
 {
-  "ip": "203.0.113.1",
-  "isp": "Example ISP",
-  "country": "JP",
-  "dnsLeak": false,
-  "webrtcLeak": false,
-  "ipv6Leak": false
+  "success": true,
+  "lastUpdate": "2026-01-01T00:00:00+09:00",
+  "data": [
+    {
+      "vpnName": "Mullvad",
+      "headquarters": "Sweden",
+      "totalScore": 92,
+      "grade": "A",
+      "scores": {
+        "noLogPolicy": 5,
+        "thirdPartyAudit": 5,
+        "transparencyReport": 4,
+        "jurisdiction": 5,
+        "openSource": 5,
+        "ramOnlyServers": 5
+      }
+    }
+  ]
 }
 ```
+
+---
+
+## 📈 Sample Outputs
+
+### Twitter Auto-Post (Speed Ranking)
+```
+📊 今日のVPN速度ランキング（日本実測）
+
+🥇 NordVPN: 485 Mbps
+🥈 ExpressVPN: 452 Mbps
+🥉 Private Internet Access: 421 Mbps
+
+測定時刻: 01/21 10:00
+詳細データ▶️ https://www.blstweb.jp/network/vpn/tokyo-vpn-speed-monitor/
+
+#VPN #速度測定 #リモートワーク
+```
+
+### Twitter Auto-Post (Trust Score)
+```
+🔒 VPNトラストスコア更新【2026年1月】
+
+プライバシー・透明性の総合評価
+
+🥇 Mullvad: 92点（A）
+🥈 ProtonVPN: 89点（A）
+🥉 ExpressVPN: 85点（A）
+
+A評価: 5社
+
+詳細▶️ https://www.blstweb.jp/network/vpn/vpn-trust-ranking/
+
+#VPN #プライバシー #セキュリティ
+```
+
+### Quarterly Report (Engine 8)
+
+Generates comprehensive market analysis including:
+- Executive Summary
+- Speed Performance Statistics
+- Price Trend Analysis
+- Reliability Metrics
+- Trust Score Analysis
+- Overall Rankings (weighted: Speed 30%, Price 25%, Reliability 15%, Trust 30%)
+- Future Forecasts
+
+---
+
+## 📚 Documentation
+
+| Document | Description |
+|----------|-------------|
+| [Setup Guide](docs/SETUP.md) | Complete installation instructions |
+| [API Documentation](docs/API.md) | Full API reference |
+| [Deployment Guide](docs/DEPLOYMENT.md) | Production deployment |
+| [Stability Calculation](docs/STABILITY_CALCULATION.md) | Stability score methodology |
+| [Trust Score Methodology](docs/TRUST_SCORE_METHODOLOGY.md) | Privacy evaluation criteria |
+
+---
+
+## 📄 Academic Publications
+
+### Dataset DOIs
+
+| Repository | DOI | Description |
+|------------|-----|-------------|
+| **Harvard Dataverse** | [10.7910/DVN/OMC9A4](https://doi.org/10.7910/DVN/OMC9A4) | Primary academic dataset |
+| **Zenodo** | [10.5281/zenodo.18091751](https://doi.org/10.5281/zenodo.18091751) | Versioned releases |
+| **IEEE DataPort** | [10.21227/9ej5-dp09](https://doi.org/10.21227/9ej5-dp09) | Engineering community |
+| **Kaggle** | [10.34740/kaggle/dsv/14451497](https://doi.org/10.34740/kaggle/dsv/14451497) | Data science community |
+| **figshare** | [10.6084/m9.figshare.30969004](https://doi.org/10.6084/m9.figshare.30969004) | Open access |
+| **OSF** | [10.17605/OSF.IO/VNCDH](https://doi.org/10.17605/OSF.IO/VNCDH) | Open science |
+| **Mendeley Data** | [10.17632/hysp9jzg5h.2](https://doi.org/10.17632/hysp9jzg5h.2) | Research data |
+
+### Citation
+
+```bibtex
+@dataset{hamaya2026tokyo,
+  author = {Hamaya, Takeshi},
+  title = {Tokyo VPN Speed Monitor: A Longitudinal Open Dataset of VPN Performance Metrics in Japan},
+  year = {2026},
+  publisher = {Zenodo},
+  doi = {10.5281/zenodo.18207135},
+  url = {https://doi.org/10.5281/zenodo.18207135}
+}
+```
+
+---
 
 ## 🤝 Contributing
 
@@ -203,44 +398,42 @@ Contributions are welcome! Please read [CONTRIBUTING.md](CONTRIBUTING.md) for de
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
+---
+
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🙏 Acknowledgments
-
-- Speed testing methodology inspired by VPN comparison sites
-- Stability calculation based on statistical analysis
-- Community feedback and contributions
+---
 
 ## 📞 Contact
 
-- **Website:** [https://www.blstweb.jp/](https://www.blstweb.jp/)
-- **X:** [@takechiyo0210](https://x.com/taechiyo0210)
-- **Issues:** [GitHub Issues](https://github.com/yourusername/vpn-stability-ranking/issues)
+- **Website:** https://www.blstweb.jp/
+- **X (Twitter):** [@takechiyo0210](https://x.com/takechiyo0210)
+- **VPN Bot:** [@remoteaccessvpn](https://twitter.com/remoteaccessvpn)
+- **Issues:** [GitHub Issues](https://github.com/hmy0210/vpn-stability-ranking/issues)
 
-## 📚 Documentation
+---
 
-- [Setup Guide](docs/SETUP.md)
-- [API Documentation](docs/API.md)
-- [Deployment Guide](docs/DEPLOYMENT.md)
-- [Stability Calculation](docs/STABILITY_CALCULATION.md)
+## 🙏 Acknowledgments
 
-## 📄 Publication
+- Speed testing methodology inspired by VPN comparison research
+- Stability calculation based on statistical analysis (Coefficient of Variation)
+- Trust Score criteria based on EFF, Privacy International guidelines
+- Community feedback and contributions
 
-Hamaya, T. (2026). *Tokyo VPN Speed Monitor: A Longitudinal Open Dataset of VPN Performance Metrics in Japan*. Zenodo. https://doi.org/10.5281/zenodo.18207135
+---
 
-## 📊 Data Availability
+## 📊 Current Stats
 
-| Repository | DOI |
-|------------|-----|
-| Harvard Dataverse | [10.7910/DVN/OMC9A4](https://doi.org/10.7910/DVN/OMC9A4) |
-| Zenodo | [10.5281/zenodo.18091751](https://doi.org/10.5281/zenodo.18091751) |
-| IEEE DataPort | [10.21227/9ej5-dp09](https://doi.org/10.21227/9ej5-dp09) |
-| Kaggle | [10.34740/kaggle/dsv/14451497](https://doi.org/10.34740/kaggle/dsv/14451497) |
-| figshare | [10.6084/m9.figshare.30969004](https://doi.org/10.6084/m9.figshare.30969004) |
-| OSF | [10.17605/OSF.IO/VNCDH](https://doi.org/10.17605/OSF.IO/VNCDH) |
-| Mendeley Data | [10.17632/hysp9jzg5h.2](https://doi.org/10.17632/hysp9jzg5h.2) |
+| Metric | Value |
+|--------|-------|
+| VPNs Monitored | 15 |
+| Total Measurements | 3,000+ |
+| Update Frequency | 6 hours |
+| Location | Tokyo, Japan |
+| Infrastructure Cost | $0/month |
+| Uptime | 99.8% |
 
 ---
 
