@@ -10,23 +10,23 @@ This folder contains all Google Apps Script (GAS) files for the Tokyo VPN Speed 
 │  (Speed Data, Price History, Outage, News, Reports)             │
 ├─────────────────────────────────────────────────────────────────┤
 │                                                                 │
-│  vpn-speed-tracker-multiregion.gs ─────┐                       │
-│  engine2a-phase2-pricing.gs ───────────┼──► Data Collection    │
-│  engine2b-advanced-outage-detection.gs─┤                       │
-│  engine2b-phase2-news-monitor.gs ──────┘                       │
+│  vpn-speed-tracker.gs             ─────┐                       │
+│  price-scraper.gs           ───────────┼──► Data Collection    │
+│  outage-detection.gs                  ─┤                       │
+│  news-monitor.gs                 ──────┘                       │
 │                                                                 │
-│  twitter-oauth1-post-fixed.gs ─────────────► Notifications     │
-│  engine2a-price-alert.gs ──────────────────►                   │
+│  twitter-poster.gs            ─────────────► Notifications     │
+│  price-alert.gs          ──────────────────►                   │
 │                                                                 │
-│  engine8-vpn-market-report.gs ─────────────► Reporting         │
-│  mailpoet-semi-auto.gs ────────────────────►                   │
+│  market-report.gs             ─────────────► Reporting         │
+│  weekly-digest.gs      ────────────────────►                   │
 │                                                                 │
 └─────────────────────────────────────────────────────────────────┘
 
 ┌─────────────────────────────────────────────────────────────────┐
 │              Separate Spreadsheet (Trust Score)                 │
 ├─────────────────────────────────────────────────────────────────┤
-│  vpn-trust-score-system.gs ────────────────► Trust Evaluation  │
+│  trust-score.gs             ────────────────► Trust Evaluation  │
 │  (Uses Claude API for automated assessment)                     │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -39,25 +39,25 @@ This folder contains all Google Apps Script (GAS) files for the Tokyo VPN Speed 
 
 | File | Engine | Description | Trigger |
 |------|--------|-------------|---------|
-| `vpn-speed-tracker-multiregion.gs` | 1 | Speed measurement for 15 VPNs | Every 6 hours |
-| `engine2a-phase2-pricing.gs` | 2a | Price scraping with ScraperAPI | Daily 9:00 AM |
-| `engine2a-price-alert.gs` | 2a+ | Price change detection & alerts | After price scraping |
-| `engine2b-advanced-outage-detection.gs` | 2b | Statistical anomaly detection | Hourly |
-| `engine2b-phase2-news-monitor.gs` | 2b+ | Google News RSS monitoring | Every 6 hours |
+| `speed-tracker.gs`   | 1 | Speed measurement for 15 VPNs | Every 6 hours |
+| `price-scraper.gs`   | 2a | Price scraping with ScraperAPI | Daily 9:00 AM |
+| `price-alert.gs`     | 2a+ | Price change detection & alerts | After price scraping |
+| `outage-detection.gs`| 2b | Statistical anomaly detection | Hourly |
+| `news-monitor.gs`    | 2b+ | Google News RSS monitoring | Every 6 hours |
 
 ### Notification & Reporting
 
 | File | Description | Trigger |
 |------|-------------|---------|
-| `twitter-oauth1-post-fixed.gs` | Twitter OAuth 1.0a posting (speed + trust) | 10:00, 15:00, 20:00 / Monthly 1st |
-| `mailpoet-semi-auto.gs` | Weekly newsletter digest generator | Monday 9:00 AM |
-| `engine8-vpn-market-report.gs` | Quarterly market report with PDF | Quarterly 1st |
+| `twitter-poster.gs`| Twitter OAuth 1.0a posting (speed + trust) | 10:00, 15:00, 20:00 / Monthly 1st |
+| `weekly-digest.gs` | Weekly newsletter digest generator | Monday 9:00 AM |
+| `market-report.gs` | Quarterly market report with PDF | Quarterly 1st |
 
 ### Trust Score (Separate Project)
 
 | File | Description | Trigger |
 |------|-------------|---------|
-| `vpn-trust-score-system.gs` | Claude API-based trust evaluation | Monthly 1st, 10:00 |
+| `trust-score.gs`   | Claude API-based trust evaluation | Monthly 1st, 10:00 |
 
 ### Configuration
 
@@ -74,14 +74,14 @@ This folder contains all Google Apps Script (GAS) files for the Tokyo VPN Speed 
 1. Create a new Google Spreadsheet
 2. Go to **Extensions → Apps Script**
 3. Copy the following files:
-   - `vpn-speed-tracker-multiregion.gs`
-   - `engine2a-phase2-pricing.gs`
-   - `engine2a-price-alert.gs`
-   - `engine2b-advanced-outage-detection.gs`
-   - `engine2b-phase2-news-monitor.gs`
-   - `twitter-oauth1-post-fixed.gs`
-   - `mailpoet-semi-auto.gs`
-   - `engine8-vpn-market-report.gs`
+   - `speed-tracker.gs`
+   - `price-scraper.gs`
+   - `price-alert.gs`
+   - `outage-detection.gs`
+   - `news-monitor.gs`
+   - `twitter-poster.gs`
+   - `weekly-digest.gs`
+   - `market-report.gs`
    - `config.example.gs` → rename to `config.gs` and fill in values
 
 4. Create required sheets:
