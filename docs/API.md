@@ -1,366 +1,477 @@
-# API Documentation
+# 📡 API Documentation
 
-The VPN Stability Ranking system provides a public Web App API for accessing speed rankings and statistics.
+This document describes all API endpoints available in the Tokyo VPN Speed Monitor system.
 
-## 🌐 Base URL
+---
+
+## Base URLs
+
+After deploying the Google Apps Script projects as Web Apps, you'll have two base URLs:
 
 ```
-https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+Main Project:    https://script.google.com/macros/s/{MAIN_DEPLOYMENT_ID}/exec
+Trust Project:   https://script.google.com/macros/s/{TRUST_DEPLOYMENT_ID}/exec
 ```
 
-Replace `YOUR_DEPLOYMENT_ID` with your actual Apps Script Web App deployment ID.
+---
 
-## 📊 Endpoints
+## Main Project Endpoints
 
-### GET / - Get Current Rankings
+### 1. Speed Ranking
 
-Returns the latest VPN speed rankings.
+Get the latest speed ranking for all monitored VPNs.
 
-**Request:**
-```bash
-curl https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec
+**Endpoint:**
+```
+GET ?type=ranking
 ```
 
 **Response:**
 ```json
 {
-  "status": "success",
-  "timestamp": "2025-12-20T19:00:00.000Z",
-  "totalVPNs": 15,
-  "rankings": [
+  "lastUpdate": "2026-01-21T10:00:00.000Z",
+  "region": "JP",
+  "regionName": "日本（東京）",
+  "updateInterval": "6時間ごと",
+  "vpnCount": 15,
+  "data": [
     {
-      "timestamp": "2025-12-20T18:00:00.000Z",
-      "vpnName": "NordVPN",
-      "download": 460,
-      "upload": 230,
-      "ping": 15,
-      "stability": 95.2,
-      "reliability": 100,
+      "timestamp": "2026-01-21T10:00:00.000Z",
+      "name": "NordVPN",
+      "download": 485.2,
+      "upload": 312.5,
+      "ping": 12.3,
+      "stability": 87,
+      "reliability": 98,
       "totalScore": 97.8,
-      "rank": 1
+      "rank": 1,
+      "stabilityScore7d": 94.5
     },
     {
-      "timestamp": "2025-12-20T18:00:00.000Z",
-      "vpnName": "ExpressVPN",
-      "download": 433,
-      "upload": 215,
-      "ping": 18,
-      "stability": 92.1,
-      "reliability": 100,
-      "totalScore": 95.3,
-      "rank": 2
+      "timestamp": "2026-01-21T10:00:00.000Z",
+      "name": "ExpressVPN",
+      "download": 452.1,
+      "upload": 298.4,
+      "ping": 15.2,
+      "stability": 88,
+      "reliability": 97,
+      "totalScore": 95.2,
+      "rank": 2,
+      "stabilityScore7d": 92.3
     }
-    // ... more VPNs
   ]
 }
 ```
 
-**Response Fields:**
-
+**Fields:**
 | Field | Type | Description |
 |-------|------|-------------|
-| `status` | string | "success" or "error" |
-| `timestamp` | string | ISO 8601 timestamp of response |
-| `totalVPNs` | number | Number of VPNs in rankings |
-| `rankings` | array | Array of VPN ranking objects |
+| `lastUpdate` | ISO Date | Last measurement timestamp |
+| `region` | String | Region code (JP) |
+| `regionName` | String | Region name in Japanese |
+| `updateInterval` | String | Measurement frequency |
+| `vpnCount` | Number | Number of VPNs in ranking |
+| `data[].name` | String | VPN service name |
+| `data[].download` | Number | Download speed (Mbps) |
+| `data[].upload` | Number | Upload speed (Mbps) |
+| `data[].ping` | Number | Latency (ms) |
+| `data[].stability` | Number | Instant stability score (0-100) |
+| `data[].reliability` | Number | Connection reliability (%) |
+| `data[].totalScore` | Number | Overall score (0-100) |
+| `data[].rank` | Number | Current ranking position |
+| `data[].stabilityScore7d` | Number | 7-day stability score |
 
-**Ranking Object Fields:**
+---
 
-| Field | Type | Unit | Description |
-|-------|------|------|-------------|
-| `timestamp` | string | - | When this measurement was taken |
-| `vpnName` | string | - | VPN service name |
-| `download` | number | Mbps | Download speed |
-| `upload` | number | Mbps | Upload speed |
-| `ping` | number | ms | Latency |
-| `stability` | number | 0-100 | Stability score |
-| `reliability` | number | 0-100 | Reliability score (% uptime) |
-| `totalScore` | number | 0-100 | Overall score |
-| `rank` | number | - | Current ranking (1 = best) |
+### 2. Stability Scores
 
-**Error Response:**
+Get detailed stability analysis based on 7-day historical data.
+
+**Endpoint:**
+```
+GET ?type=stability
+```
+
+**Response:**
 ```json
 {
-  "status": "error",
-  "message": "No data available"
+  "region": "JP",
+  "regionName": "日本（東京）",
+  "period": "過去7日間",
+  "lastUpdate": "2026-01-21T10:00:00.000Z",
+  "data": [
+    {
+      "name": "NordVPN",
+      "stabilityScore": 94.5,
+      "avgSpeed": 480,
+      "speedStdDev": 15.2,
+      "avgPing": 12.5,
+      "pingStdDev": 2.1,
+      "reliability": 98.0,
+      "dataPoints": 28
+    }
+  ]
 }
 ```
 
-## 📈 Usage Examples
+**Fields:**
+| Field | Type | Description |
+|-------|------|-------------|
+| `data[].stabilityScore` | Number | Calculated stability (0-100) |
+| `data[].avgSpeed` | Number | Average download speed (Mbps) |
+| `data[].speedStdDev` | Number | Speed standard deviation |
+| `data[].avgPing` | Number | Average latency (ms) |
+| `data[].pingStdDev` | Number | Latency standard deviation |
+| `data[].reliability` | Number | Average reliability (%) |
+| `data[].dataPoints` | Number | Number of measurements |
 
-### JavaScript (Fetch API)
+---
 
-```javascript
-fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec')
-  .then(response => response.json())
-  .then(data => {
-    console.log(`Total VPNs: ${data.totalVPNs}`);
-    
-    data.rankings.forEach(vpn => {
-      console.log(`${vpn.rank}. ${vpn.vpnName}: ${vpn.download} Mbps`);
-    });
-  })
-  .catch(error => console.error('Error:', error));
+### 3. Price Data
+
+Get the latest pricing information for all VPNs.
+
+**Endpoint:**
+```
+GET ?action=getPricing
 ```
 
-### Python (requests)
+**Response:**
+```json
+{
+  "success": true,
+  "lastUpdate": "2026-01-21T09:00:00.000Z",
+  "count": 15,
+  "data": [
+    {
+      "name": "NordVPN",
+      "price": 370,
+      "currency": "JPY",
+      "lastUpdate": "2026-01-21T09:00:00.000Z",
+      "isFallback": false,
+      "method": "scraperapi"
+    },
+    {
+      "name": "ExpressVPN",
+      "price": 524,
+      "currency": "JPY",
+      "lastUpdate": "2026-01-21T09:00:00.000Z",
+      "isFallback": false,
+      "method": "direct"
+    }
+  ]
+}
+```
+
+**Fields:**
+| Field | Type | Description |
+|-------|------|-------------|
+| `data[].price` | Number | Monthly price |
+| `data[].currency` | String | Currency code (JPY, USD, EUR) |
+| `data[].isFallback` | Boolean | Whether fallback price was used |
+| `data[].method` | String | Scraping method used |
+
+---
+
+## Trust Score Project Endpoints
+
+### 4. Trust Scores
+
+Get privacy and transparency scores for all VPNs.
+
+**Endpoint:**
+```
+GET ?action=getTrustScores
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "lastUpdate": "2026-01-01T10:00:00.000Z",
+  "count": 15,
+  "data": [
+    {
+      "vpnName": "Mullvad",
+      "headquarters": "スウェーデン",
+      "scores": {
+        "noLogPolicy": 5,
+        "thirdPartyAudit": 5,
+        "transparencyReport": 4,
+        "jurisdiction": 3,
+        "dataRetention": 5,
+        "openSource": 5,
+        "ramOnlyServers": 5,
+        "incidentResponse": 5,
+        "legalResponse": 5,
+        "operatingYears": 5
+      },
+      "totalScore": 92,
+      "grade": "A",
+      "lastUpdate": "2026-01-01T10:00:00.000Z"
+    }
+  ]
+}
+```
+
+**Score Fields (1-5 scale):**
+| Field | Max Points | Description |
+|-------|------------|-------------|
+| `noLogPolicy` | 5 | No-log policy clarity and verification |
+| `thirdPartyAudit` | 5 | Independent security audits |
+| `transparencyReport` | 5 | Transparency report publication |
+| `jurisdiction` | 5 | Privacy-friendly jurisdiction |
+| `dataRetention` | 5 | Data retention policy |
+| `openSource` | 5 | Open source status |
+| `ramOnlyServers` | 5 | RAM-only server infrastructure |
+| `incidentResponse` | 5 | Security incident handling |
+| `legalResponse` | 5 | Response to legal requests |
+| `operatingYears` | 5 | Track record length |
+
+**Grade Scale:**
+| Grade | Score Range |
+|-------|-------------|
+| A | 85-100 |
+| B | 70-84 |
+| C | 55-69 |
+| D | 40-54 |
+| F | 0-39 |
+
+---
+
+### 5. Integrated Ranking
+
+Get combined ranking with speed, price, and trust scores.
+
+**Endpoint:**
+```
+GET ?action=getIntegrated
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "lastUpdate": "2026-01-21T10:00:00.000Z",
+  "count": 15,
+  "weights": {
+    "trust": "30%",
+    "speed": "30%",
+    "price": "20%",
+    "stability": "20%"
+  },
+  "data": [
+    {
+      "rank": 1,
+      "vpnName": "NordVPN",
+      "headquarters": "パナマ",
+      "trustScore": 85,
+      "trustGrade": "A",
+      "downloadSpeed": 485,
+      "uploadSpeed": 312,
+      "ping": 12,
+      "speedScore": 97.8,
+      "stabilityScore": 94.5,
+      "price": 370,
+      "currency": "JPY",
+      "priceScore": 87,
+      "integratedScore": 91
+    }
+  ]
+}
+```
+
+---
+
+### 6. VPN Detail
+
+Get detailed information for a specific VPN.
+
+**Endpoint:**
+```
+GET ?action=getVPNDetail&vpn={VPN_NAME}
+```
+
+**Example:**
+```
+GET ?action=getVPNDetail&vpn=NordVPN
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "vpnName": "NordVPN",
+    "headquarters": "パナマ",
+    "scores": {
+      "noLogPolicy": 5,
+      "thirdPartyAudit": 5,
+      "transparencyReport": 4,
+      "jurisdiction": 5,
+      "dataRetention": 5,
+      "openSource": 3,
+      "ramOnlyServers": 5,
+      "incidentResponse": 4,
+      "legalResponse": 5,
+      "operatingYears": 4
+    },
+    "totalScore": 85,
+    "grade": "A",
+    "jurisdictionInfo": {
+      "fiveEyes": false,
+      "nineEyes": false,
+      "fourteenEyes": false,
+      "dataRetention": "なし",
+      "score": 5
+    },
+    "lastUpdate": "2026-01-01T10:00:00.000Z"
+  }
+}
+```
+
+---
+
+### 7. Jurisdiction Database
+
+Get the complete jurisdiction database.
+
+**Endpoint:**
+```
+GET ?action=getJurisdiction
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "count": 12,
+  "data": [
+    {
+      "country": "パナマ",
+      "fiveEyes": false,
+      "nineEyes": false,
+      "fourteenEyes": false,
+      "dataRetention": "なし",
+      "score": 5
+    },
+    {
+      "country": "アメリカ",
+      "fiveEyes": true,
+      "nineEyes": true,
+      "fourteenEyes": true,
+      "dataRetention": "あり",
+      "score": 1
+    }
+  ]
+}
+```
+
+---
+
+## Error Responses
+
+All endpoints return errors in this format:
+
+```json
+{
+  "success": false,
+  "error": "Error message",
+  "message": "Human-readable description"
+}
+```
+
+**Common Errors:**
+| Error | Description |
+|-------|-------------|
+| `No data available` | Run measurement/scraping first |
+| `VPN not found` | Invalid VPN name parameter |
+| `Invalid type parameter` | Unknown endpoint type |
+| `Unknown action` | Invalid action parameter |
+
+---
+
+## Rate Limits
+
+- Google Apps Script: 20,000 calls/day per user
+- No artificial rate limits imposed
+- Recommended: Cache responses for 5+ minutes
+
+---
+
+## CORS
+
+All endpoints support CORS and can be called from any domain.
+
+---
+
+## Usage Examples
+
+### JavaScript (Fetch)
+
+```javascript
+// Get speed ranking
+fetch('https://script.google.com/macros/s/YOUR_ID/exec?type=ranking')
+  .then(response => response.json())
+  .then(data => console.log(data));
+
+// Get trust scores
+fetch('https://script.google.com/macros/s/YOUR_TRUST_ID/exec?action=getTrustScores')
+  .then(response => response.json())
+  .then(data => console.log(data));
+```
+
+### Python (Requests)
 
 ```python
 import requests
 
-url = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec'
-response = requests.get(url)
+# Get speed ranking
+response = requests.get('https://script.google.com/macros/s/YOUR_ID/exec?type=ranking')
+data = response.json()
+print(data)
 
-if response.status_code == 200:
-    data = response.json()
-    
-    for vpn in data['rankings']:
-        print(f"{vpn['rank']}. {vpn['vpnName']}: {vpn['download']} Mbps")
-else:
-    print(f"Error: {response.status_code}")
+# Get integrated ranking
+response = requests.get('https://script.google.com/macros/s/YOUR_TRUST_ID/exec?action=getIntegrated')
+data = response.json()
+print(data)
 ```
 
 ### cURL
 
 ```bash
-curl -X GET \
-  'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec' \
-  -H 'Accept: application/json'
+# Get speed ranking
+curl "https://script.google.com/macros/s/YOUR_ID/exec?type=ranking"
+
+# Get trust scores
+curl "https://script.google.com/macros/s/YOUR_TRUST_ID/exec?action=getTrustScores"
 ```
-
-### jQuery (AJAX)
-
-```javascript
-$.ajax({
-  url: 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec',
-  type: 'GET',
-  dataType: 'json',
-  success: function(data) {
-    $('#vpn-list').empty();
-    
-    data.rankings.forEach(function(vpn) {
-      $('#vpn-list').append(
-        `<li>${vpn.rank}. ${vpn.vpnName} - ${vpn.download} Mbps</li>`
-      );
-    });
-  },
-  error: function(error) {
-    console.error('Error:', error);
-  }
-});
-```
-
-## 🔧 Rate Limiting
-
-**Current Limits:**
-- No authentication required
-- No rate limiting (subject to Google Apps Script quotas)
-- Recommended: Cache responses for 5-10 minutes
-
-**Google Apps Script Quotas:**
-- Consumer: 20,000 URL Fetch calls/day
-- G Suite: 100,000 URL Fetch calls/day
-
-## 📊 Data Freshness
-
-- Rankings updated every 6 hours
-- Latest measurement timestamp included in response
-- Check `timestamp` field to verify data freshness
-
-## 🎨 Display Widget Example
-
-### HTML/CSS/JavaScript Widget
-
-```html
-<!DOCTYPE html>
-<html>
-<head>
-  <style>
-    .vpn-widget {
-      font-family: Arial, sans-serif;
-      max-width: 400px;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 20px;
-    }
-    
-    .vpn-item {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px;
-      border-bottom: 1px solid #eee;
-    }
-    
-    .rank {
-      font-weight: bold;
-      color: #4285f4;
-    }
-    
-    .speed {
-      color: #0f9d58;
-    }
-  </style>
-</head>
-<body>
-  <div class="vpn-widget" id="vpn-widget">
-    <h3>VPN Speed Rankings</h3>
-    <div id="rankings"></div>
-    <small id="updated"></small>
-  </div>
-
-  <script>
-    const API_URL = 'https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec';
-    
-    fetch(API_URL)
-      .then(r => r.json())
-      .then(data => {
-        const container = document.getElementById('rankings');
-        const top5 = data.rankings.slice(0, 5);
-        
-        top5.forEach(vpn => {
-          const div = document.createElement('div');
-          div.className = 'vpn-item';
-          div.innerHTML = `
-            <span><span class="rank">${vpn.rank}.</span> ${vpn.vpnName}</span>
-            <span class="speed">${vpn.download} Mbps</span>
-          `;
-          container.appendChild(div);
-        });
-        
-        const updated = new Date(data.timestamp);
-        document.getElementById('updated').textContent = 
-          `Updated: ${updated.toLocaleString()}`;
-      });
-  </script>
-</body>
-</html>
-```
-
-## 🔐 CORS
-
-**Cross-Origin Resource Sharing (CORS) is enabled by default.**
-
-The API can be accessed from any domain.
-
-## ⚠️ Error Handling
-
-### Common Errors
-
-1. **No Data Available**
-   ```json
-   {
-     "status": "error",
-     "message": "No data available"
-   }
-   ```
-   **Solution:** Wait for first data collection or trigger `measureAllVPNSpeeds()`
-
-2. **Service Unavailable**
-   ```json
-   {
-     "status": "error",
-     "message": "Service temporarily unavailable"
-   }
-   ```
-   **Solution:** Retry after a few seconds
-
-3. **Quota Exceeded**
-   ```
-   HTTP 429 Too Many Requests
-   ```
-   **Solution:** Implement exponential backoff
-
-### Recommended Error Handling
-
-```javascript
-async function getVPNRankings() {
-  const MAX_RETRIES = 3;
-  let retries = 0;
-  
-  while (retries < MAX_RETRIES) {
-    try {
-      const response = await fetch(API_URL);
-      
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.status === 'error') {
-        throw new Error(data.message);
-      }
-      
-      return data;
-      
-    } catch (error) {
-      retries++;
-      
-      if (retries >= MAX_RETRIES) {
-        console.error('Max retries reached:', error);
-        return null;
-      }
-      
-      // Exponential backoff
-      await new Promise(r => setTimeout(r, 1000 * Math.pow(2, retries)));
-    }
-  }
-}
-```
-
-## 📱 Mobile App Integration
-
-### React Native Example
-
-```javascript
-import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList } from 'react-native';
-
-const VPNRankings = () => {
-  const [rankings, setRankings] = useState([]);
-  
-  useEffect(() => {
-    fetch('https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec')
-      .then(r => r.json())
-      .then(data => setRankings(data.rankings));
-  }, []);
-  
-  return (
-    <FlatList
-      data={rankings}
-      keyExtractor={item => item.vpnName}
-      renderItem={({item}) => (
-        <View>
-          <Text>{item.rank}. {item.vpnName}</Text>
-          <Text>{item.download} Mbps</Text>
-        </View>
-      )}
-    />
-  );
-};
-```
-
-## 🔄 Webhooks (Future)
-
-*Webhooks are not currently supported but may be added in future versions.*
-
-Planned features:
-- Subscribe to price changes
-- Receive outage notifications
-- Get new ranking alerts
-
-## 📚 Additional Resources
-
-- [Google Apps Script Web Apps](https://developers.google.com/apps-script/guides/web)
-- [Deployment Guide](DEPLOYMENT.md)
-- [Setup Guide](SETUP.md)
-
-## 🆘 Support
-
-- GitHub Issues: Report API bugs
-- Discussions: Ask questions
-- Email: api@your-domain.com
 
 ---
 
-**Happy Integrating!** 🚀
+## Webhook Integration
+
+For price change alerts and outage notifications, the system posts to Twitter automatically. To receive notifications via other channels, you can:
+
+1. Set up a webhook endpoint
+2. Modify `twitter-oauth1-post-fixed.gs` to call your webhook
+3. Or periodically poll the API endpoints
+
+---
+
+## Data Freshness
+
+| Data Type | Update Frequency |
+|-----------|------------------|
+| Speed Ranking | Every 6 hours |
+| Stability Score | Calculated on request (7-day window) |
+| Price Data | Daily at 9:00 AM JST |
+| Trust Score | Monthly on 1st |
+| Integrated Ranking | Calculated on request |
+
+---
+
+## Support
+
+For API issues, please open a GitHub issue at:
+https://github.com/hmy0210/vpn-stability-ranking/issues
