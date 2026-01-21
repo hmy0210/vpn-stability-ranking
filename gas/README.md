@@ -1,181 +1,272 @@
-# Google Apps Script Files
+# 📁 Google Apps Script Files
 
-This directory contains all Google Apps Script files for the Tokyo VPN Speed Monitor.
+This folder contains all Google Apps Script (GAS) files for the Tokyo VPN Speed Monitor system.
 
-## 📦 Files
+## 🏗️ Architecture Overview
 
-### Core System
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                     Main Spreadsheet                            │
+│  (Speed Data, Price History, Outage, News, Reports)             │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  vpn-speed-tracker-multiregion.gs ─────┐                       │
+│  engine2a-phase2-pricing.gs ───────────┼──► Data Collection    │
+│  engine2b-advanced-outage-detection.gs─┤                       │
+│  engine2b-phase2-news-monitor.gs ──────┘                       │
+│                                                                 │
+│  twitter-oauth1-post-fixed.gs ─────────────► Notifications     │
+│  engine2a-price-alert.gs ──────────────────►                   │
+│                                                                 │
+│  engine8-vpn-market-report.gs ─────────────► Reporting         │
+│  mailpoet-semi-auto.gs ────────────────────►                   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
 
-1. **config.example.gs** - Configuration template
-   - Copy to `config.gs` and fill in your credentials
-   - Contains API keys, spreadsheet IDs, and settings
+┌─────────────────────────────────────────────────────────────────┐
+│              Separate Spreadsheet (Trust Score)                 │
+├─────────────────────────────────────────────────────────────────┤
+│  vpn-trust-score-system.gs ────────────────► Trust Evaluation  │
+│  (Uses Claude API for automated assessment)                     │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-2. **vpn-speed-tracker.gs** - Speed monitoring system
-   - Tests 15 VPNs every 6 hours
-   - Calculates stability and reliability scores
-   - Provides Web App API endpoint
+---
 
-3. **price-scraper.gs** - Price monitoring
-   - Daily price scraping with ScraperAPI
-   - Fallback to direct scraping
-   - Historical price tracking
+## 📄 File Descriptions
 
-4. **price-alert.gs** - Price change detection
-   - Detects 5%+ price changes
-   - Auto-posts alerts to Twitter (optional)
+### Core Engines
 
-5. **outage-detector.gs** - Outage detection
-   - Statistical anomaly detection
-   - Historical average comparison
-   - Consecutive anomaly confirmation
+| File | Engine | Description | Trigger |
+|------|--------|-------------|---------|
+| `vpn-speed-tracker-multiregion.gs` | 1 | Speed measurement for 15 VPNs | Every 6 hours |
+| `engine2a-phase2-pricing.gs` | 2a | Price scraping with ScraperAPI | Daily 9:00 AM |
+| `engine2a-price-alert.gs` | 2a+ | Price change detection & alerts | After price scraping |
+| `engine2b-advanced-outage-detection.gs` | 2b | Statistical anomaly detection | Hourly |
+| `engine2b-phase2-news-monitor.gs` | 2b+ | Google News RSS monitoring | Every 6 hours |
 
-6. **news-monitor.gs** - News aggregation
-   - Google News RSS monitoring
-   - Keyword-based filtering
-   - Duplicate detection
+### Notification & Reporting
 
-7. **market-report.gs** - Quarterly reports
-   - Automated market analysis
-   - PDF generation via Google Docs
-   - Statistics and forecasts
+| File | Description | Trigger |
+|------|-------------|---------|
+| `twitter-oauth1-post-fixed.gs` | Twitter OAuth 1.0a posting (speed + trust) | 10:00, 15:00, 20:00 / Monthly 1st |
+| `mailpoet-semi-auto.gs` | Weekly newsletter digest generator | Monday 9:00 AM |
+| `engine8-vpn-market-report.gs` | Quarterly market report with PDF | Quarterly 1st |
 
-### Optional
+### Trust Score (Separate Project)
 
-8. **twitter-poster.gs** - Twitter integration
-   - OAuth 1.0a authentication
-   - Duplicate detection
-   - Rate limiting
+| File | Description | Trigger |
+|------|-------------|---------|
+| `vpn-trust-score-system.gs` | Claude API-based trust evaluation | Monthly 1st, 10:00 |
 
-## 🚀 Quick Start
+### Configuration
 
-### 1. Create Spreadsheet
+| File | Description |
+|------|-------------|
+| `config.example.gs` | Configuration template (copy to config.gs) |
 
-Create a new Google Spreadsheet with these sheets:
-- `速度データ` (Speed Data)
-- `VPN料金履歴` (Price History)
-- `VPN障害検知（高度）` (Outage Detection)
-- `VPNニュース履歴` (News History)
+---
 
-### 2. Set Up Apps Script
+## 🔧 Setup Instructions
 
-1. In spreadsheet: **Extensions** → **Apps Script**
-2. Copy all `.gs` files from this directory
-3. Copy `config.example.gs` to `config.gs`
-4. Fill in your `SPREADSHEET_ID` in `config.gs`
+### Step 1: Main Spreadsheet Setup
 
-### 3. Configure Triggers
+1. Create a new Google Spreadsheet
+2. Go to **Extensions → Apps Script**
+3. Copy the following files:
+   - `vpn-speed-tracker-multiregion.gs`
+   - `engine2a-phase2-pricing.gs`
+   - `engine2a-price-alert.gs`
+   - `engine2b-advanced-outage-detection.gs`
+   - `engine2b-phase2-news-monitor.gs`
+   - `twitter-oauth1-post-fixed.gs`
+   - `mailpoet-semi-auto.gs`
+   - `engine8-vpn-market-report.gs`
+   - `config.example.gs` → rename to `config.gs` and fill in values
 
-Set up time-based triggers:
-- `measureAllVPNSpeeds` - Every 6 hours
-- `scrapeAllVPNPrices` - Daily at 9:00 AM
-- `checkPriceChanges` - Daily at 10:00 AM
-- `detectOutages` - Every hour
-- `monitorVPNNews` - Every 6 hours
+4. Create required sheets:
+   - `速度データ`
+   - `VPN料金履歴`
+   - `VPN障害検知（高度）`
+   - `VPNニュース履歴`
+   - `VPN業界統計レポート`
+   - `週次ダイジェスト`
 
-### 4. Test
+### Step 2: Trust Score Setup (Separate Project)
 
-Run these functions manually to test:
-- `testSpeedMeasurement()`
-- `testPriceScraping()`
-- `testPriceChangeDetection()`
+1. Create a **new** Google Spreadsheet for Trust Score
+2. Go to **Extensions → Apps Script**
+3. Copy `vpn-trust-score-system.gs`
+4. Set Script Property: `CLAUDE_API_KEY` = your Anthropic API key
+5. Run `initialSetup()` to create sheets
+6. Deploy as Web App
+7. Copy the deployed URL to main project's config
 
-## 🔑 API Keys (Optional)
+### Step 3: Set Script Properties
 
-### ScraperAPI (for price scraping)
-1. Sign up: https://www.scraperapi.com/
-2. Get API key (free tier: 1,000 requests/month)
-3. Add to `config.gs`:
-   ```javascript
-   const SCRAPER_CONFIG = {
-     API_KEY: 'your-api-key-here'
-   };
-   ```
+In the main project, set these Script Properties:
 
-### Twitter API (for auto-posting)
-1. Apply for developer account: https://developer.twitter.com/
-2. Create app and get credentials
-3. Add to `config.gs`:
-   ```javascript
-   const TWITTER_CONFIG = {
-     CONSUMER_KEY: 'your-key',
-     CONSUMER_SECRET: 'your-secret',
-     ACCESS_TOKEN: 'your-token',
-     ACCESS_TOKEN_SECRET: 'your-token-secret'
-   };
-   ```
+| Property | Description |
+|----------|-------------|
+| `SCRAPERAPI_KEY` | ScraperAPI key for price scraping |
+
+In the Trust Score project:
+
+| Property | Description |
+|----------|-------------|
+| `CLAUDE_API_KEY` | Anthropic API key for Claude |
+
+### Step 4: Configure Triggers
+
+Run these setup functions once:
+
+```javascript
+// In main project:
+setupTriggers();           // Speed measurement (6h)
+setupPriceAlertTriggers(); // Price scraping (daily)
+setupAdvancedOutageDetectionTriggers(); // Outage (hourly)
+setupNewsMonitorTriggers(); // News (6h)
+setupAllTriggers();        // Twitter posting
+setupWeeklyDigestTrigger(); // Newsletter (weekly)
+setupQuarterlyReportTrigger(); // Report (quarterly)
+
+// In Trust Score project:
+setupMonthlyTrigger();     // Trust evaluation (monthly)
+```
+
+### Step 5: Deploy Web Apps
+
+Deploy each project as a Web App:
+
+1. **Main Project** (Speed/Price/Outage/News API)
+   - Deploy → New deployment → Web app
+   - Execute as: Me
+   - Who has access: Anyone
+
+2. **Trust Score Project** (Trust Score API)
+   - Same process, separate deployment
+
+---
+
+## 📡 API Endpoints
+
+### Main Project
+
+| Endpoint | Description |
+|----------|-------------|
+| `?type=ranking` | Speed ranking data |
+| `?type=stability` | Stability scores (7-day) |
+| `?action=getPricing` | Latest price data |
+
+### Trust Score Project
+
+| Endpoint | Description |
+|----------|-------------|
+| `?action=getTrustScores` | Trust scores for all VPNs |
+| `?action=getIntegrated` | Combined ranking (speed + price + trust) |
+| `?action=getVPNDetail&vpn=NordVPN` | Single VPN details |
+| `?action=getJurisdiction` | Jurisdiction database |
+
+---
+
+## 🔑 Required API Keys
+
+| Service | Purpose | Free Tier |
+|---------|---------|-----------|
+| **ScraperAPI** | Price scraping (JS rendering) | 1,000 req/month |
+| **Twitter API** | Auto-posting | Free (with approval) |
+| **Claude API** | Trust Score evaluation | Pay per token |
+
+### Estimated Costs
+
+| Service | Monthly Usage | Cost |
+|---------|--------------|------|
+| ScraperAPI | ~150 requests | Free |
+| Twitter API | ~100 tweets | Free |
+| Claude API | ~15 evaluations | ~$0.50 |
+| **Total** | | **~$0.50/month** |
+
+---
 
 ## 📊 Data Flow
 
 ```
-Speed Tracker (every 6h)
-  ↓
-速度データ sheet
-  ↓
-Outage Detector (every 1h)
-  ↓
-VPN障害検知 sheet
-
-Price Scraper (daily 9am)
-  ↓
-VPN料金履歴 sheet
-  ↓
-Price Alert (daily 10am)
-  ↓
-Twitter (optional)
-
-News Monitor (every 6h)
-  ↓
-VPNニュース履歴 sheet
+[Speed Measurement] ──► 速度データ sheet ──┐
+                                          │
+[Price Scraping] ────► VPN料金履歴 sheet ─┼──► [Engine 8 Report]
+                                          │         │
+[Outage Detection] ──► VPN障害検知 sheet ─┤         │
+                                          │         ▼
+[News Monitor] ──────► VPNニュース sheet ─┘    PDF Report
+                                               
+[Trust Score API] ◄─────────────────────────────────┘
+       │
+       ▼
+[Twitter Bot] ──► Speed tweets (3x daily)
+              ──► Trust tweets (monthly)
+              ──► Price alerts (on change)
+              
+[MailPoet] ────► Weekly digest (Monday)
 ```
-
-## 🔒 Security
-
-⚠️ **NEVER commit `config.gs` to version control!**
-
-The `.gitignore` file excludes:
-- `config.gs`
-- Any file with API keys
-- Spreadsheet IDs
-
-Always use `config.example.gs` as a template and keep actual credentials in `config.gs` locally.
-
-## 🐛 Troubleshooting
-
-### No data appearing in sheets
-- Check `SPREADSHEET_ID` in `config.gs`
-- Verify sheet names match exactly
-- Check trigger execution logs
-
-### ScraperAPI errors
-- Verify API key is correct
-- Check monthly quota (free tier: 1,000/month)
-- Try with `USE_SCRAPER_API: false` for direct scraping
-
-### Twitter posting fails
-- Verify all 4 credentials are correct
-- Check Twitter API access level (need write permissions)
-- Test with `testTwitterPost()`
-
-## 📚 More Information
-
-See main documentation:
-- [Setup Guide](../docs/SETUP.md)
-- [API Documentation](../docs/API.md)
-- [Deployment Guide](../docs/DEPLOYMENT.md)
-
-## 💡 Tips
-
-1. **Start Small**: Test with 3-5 VPNs first before scaling to 15
-2. **Monitor Quota**: ScraperAPI free tier is 1,000 requests/month
-3. **Check Logs**: Review execution logs daily for the first week
-4. **Backup Data**: Export spreadsheet regularly
-
-## 🆘 Getting Help
-
-- GitHub Issues: Report bugs or ask questions
-- Documentation: Check the `/docs` folder
-- Community: Discussions tab on GitHub
 
 ---
 
-**Happy Automating!** 🚀
+## 🐛 Debugging
+
+### Test Functions
+
+Each file includes test functions:
+
+```javascript
+// Speed tracker
+checkLatestData();
+checkStability();
+
+// Price scraping
+testAllVPNsPricing();
+quickPricingTest();
+
+// Outage detection
+testAdvancedOutageDetection();
+
+// News monitor
+testNewsMonitor();
+
+// Twitter
+testSpeedTweet();
+testTrustScoreTweet();
+
+// Trust Score
+testSingleVPNEvaluation();
+testIntegratedRanking();
+
+// Market Report
+testReportGeneration();
+testDataCollection();
+```
+
+### Common Issues
+
+| Issue | Solution |
+|-------|----------|
+| "SCRAPERAPI_KEY not set" | Add key to Script Properties |
+| "CLAUDE_API_KEY not set" | Add key to Script Properties |
+| Twitter 401 error | Check OAuth credentials |
+| "No data available" | Run measurement/scraping first |
+| ScraperAPI 500 error | Site may be blocking; check fallback |
+
+---
+
+## 📝 Notes
+
+- **Timezone**: All times are JST (Asia/Tokyo)
+- **Rate Limits**: Built-in delays prevent API throttling
+- **Fallback Prices**: Used when scraping fails
+- **Trust Score**: Uses Claude Sonnet 4.5 for evaluation
+- **Separate Projects**: Trust Score runs in its own spreadsheet for isolation
+
+---
+
+## 📄 License
+
+MIT License - See [LICENSE](../LICENSE) for details.
