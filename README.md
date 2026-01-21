@@ -4,7 +4,7 @@ Real-time VPN speed, stability, and **trust score** monitoring system from Tokyo
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://img.shields.io/badge/DOI-10.7910%2FDVN%2FOMC9A4-blue)](https://doi.org/10.7910/DVN/OMC9A4)
-[![Twitter](https://img.shields.io/twitter/follow/remoteaccessvpn?style=social)](https://twitter.com/remoteaccessvpn)
+[![Twitter](https://img.shields.io/twitter/follow/takechiyo0210?style=social)](https://twitter.com/takechiyo0210)
 
 ---
 
