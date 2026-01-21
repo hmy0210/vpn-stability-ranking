@@ -1,143 +1,202 @@
 /**
  * ============================================
- * VPN Outage Detector
- * Advanced anomaly detection system
+ * エンジン2B改善: 高度な異常検知アラート
+ * より精度の高い障害判定
  * ============================================
  * 
- * Features:
- * - Historical average comparison
- * - Relative performance analysis
- * - Consecutive anomaly confirmation
- * - Auto-alert system
- * 
- * Setup:
- * 1. Set up hourly trigger
- * 2. Requires speed data from vpn-speed-tracker.gs
- * 
- * Repository: https://github.com/yourusername/vpn-stability-ranking
+ * @author Tokyo VPN Speed Monitor Project
+ * @version 1.0
+ * @license MIT
  */
 
-// Configuration loaded from config.gs
-const OUTAGE_CONFIG = {
-  SPREADSHEET_ID: typeof CONFIG !== 'undefined' ? CONFIG.SPREADSHEET_ID : '',
-  SPEED_SHEET: typeof CONFIG !== 'undefined' ? CONFIG.SHEETS.SPEED_DATA : '速度データ',
-  OUTAGE_SHEET: typeof CONFIG !== 'undefined' ? CONFIG.SHEETS.OUTAGE_DETECTION : 'VPN障害検知（高度）',
-  
-  // Detection thresholds
-  HISTORICAL_THRESHOLD: 0.5, // 50% below historical average
-  RELATIVE_THRESHOLD: 0.3,   // 30% below current market average
-  CONSECUTIVE_REQUIRED: 2,   // Require 2 consecutive anomalies
-  LOOKBACK_DAYS: 7
+const OUTAGE_ADVANCED_SHEET_NAME = 'VPN障害検知（高度）';
+const VPN_SPEED_API_URL_ADVANCED = PropertiesService.getScriptProperties().getProperty('VPN_API_URL') || '';
+
+const ADVANCED_THRESHOLDS = {
+  absoluteMinSpeed: 10,
+  percentageFromAverage: 50,
+  consecutiveChecks: 2,
+  relativeComparison: true
 };
 
-function detectOutages() {
+function detectAdvancedOutages() {
   Logger.log('==========================================');
-  Logger.log('Outage Detection Started');
-  Logger.log(`Timestamp: ${new Date().toLocaleString('ja-JP')}`);
+  Logger.log('VPN障害検知（高度版）');
+  Logger.log(`実行時刻: ${new Date().toLocaleString('ja-JP')}`);
   Logger.log('==========================================');
   
-  const ss = SpreadsheetApp.openById(OUTAGE_CONFIG.SPREADSHEET_ID);
-  const speedSheet = ss.getSheetByName(OUTAGE_CONFIG.SPEED_SHEET);
-  const outageSheet = ss.getSheetByName(OUTAGE_CONFIG.OUTAGE_SHEET);
-  
-  if (!speedSheet || speedSheet.getLastRow() <= 1) {
-    Logger.log('❌ No speed data available');
-    return;
+  if (!VPN_SPEED_API_URL_ADVANCED) {
+    Logger.log('❌ VPN_API_URL not configured');
+    return [];
   }
   
-  const anomalies = detectAnomalies(speedSheet);
-  
-  if (anomalies.length > 0) {
-    Logger.log(`⚠️ Detected ${anomalies.length} potential outages`);
+  try {
+    const response = UrlFetchApp.fetch(VPN_SPEED_API_URL_ADVANCED + '?type=ranking&region=JP');
+    const data = JSON.parse(response.getContentText());
     
-    anomalies.forEach(anomaly => {
-      Logger.log(`  ${anomaly.vpnName}: ${anomaly.speed} Mbps (${anomaly.reason})`);
+    if (!data.data || data.data.length === 0) {
+      Logger.log('❌ データが取得できませんでした');
+      return [];
+    }
+    
+    Logger.log(`✅ ${data.data.length}社のデータを取得`);
+    
+    const historicalAverages = getHistoricalAverages();
+    const allSpeeds = data.data.map(vpn => vpn.download);
+    const overallMedian = calculateMedian(allSpeeds);
+    
+    const outages = [];
+    
+    data.data.forEach(vpn => {
+      const speed = vpn.download;
+      const vpnName = vpn.name;
       
-      if (outageSheet) {
-        outageSheet.appendRow([
-          anomaly.timestamp,
-          anomaly.vpnName,
-          anomaly.speed,
-          anomaly.reason,
-          anomaly.consecutiveCount
-        ]);
+      const failsAbsolute = speed < ADVANCED_THRESHOLDS.absoluteMinSpeed;
+      
+      let failsHistorical = false;
+      let historicalInfo = '';
+      if (historicalAverages[vpnName]) {
+        const avgSpeed = historicalAverages[vpnName].average;
+        const threshold = avgSpeed * (ADVANCED_THRESHOLDS.percentageFromAverage / 100);
+        failsHistorical = speed < threshold;
+        historicalInfo = `過去平均の${((speed / avgSpeed) * 100).toFixed(1)}%`;
+      }
+      
+      let failsRelative = false;
+      if (ADVANCED_THRESHOLDS.relativeComparison) {
+        failsRelative = speed < overallMedian * 0.3;
+      }
+      
+      const isOutage = failsAbsolute || failsHistorical || failsRelative;
+      
+      if (isOutage) {
+        const consecutiveCount = checkConsecutiveOutages(vpnName);
+        
+        if (consecutiveCount + 1 >= ADVANCED_THRESHOLDS.consecutiveChecks) {
+          outages.push({
+            vpn: vpnName,
+            speed: speed,
+            reasons: [
+              failsAbsolute ? '絶対値が異常に低い' : null,
+              failsHistorical ? historicalInfo : null,
+              failsRelative ? '他社比で異常に低い' : null
+            ].filter(Boolean),
+            historicalInfo: historicalInfo,
+            consecutiveCount: consecutiveCount + 1,
+            timestamp: new Date()
+          });
+        }
+        
+        recordConsecutiveOutage(vpnName);
+      } else {
+        clearConsecutiveOutage(vpnName);
       }
     });
-  } else {
-    Logger.log('✅ No outages detected');
-  }
-  
-  Logger.log('==========================================');
-}
-
-function detectAnomalies(speedSheet) {
-  const data = speedSheet.getRange(2, 1, speedSheet.getLastRow() - 1, 3).getValues();
-  
-  const cutoffDate = new Date();
-  cutoffDate.setDate(cutoffDate.getDate() - OUTAGE_CONFIG.LOOKBACK_DAYS);
-  
-  // Get latest speeds and historical data
-  const latestSpeeds = {};
-  const historicalSpeeds = {};
-  
-  data.forEach(row => {
-    const timestamp = new Date(row[0]);
-    const vpnName = row[1];
-    const speed = row[2];
     
-    if (timestamp >= cutoffDate) {
-      if (!historicalSpeeds[vpnName]) {
-        historicalSpeeds[vpnName] = [];
-      }
-      historicalSpeeds[vpnName].push(speed);
-    }
-    
-    if (!latestSpeeds[vpnName] || timestamp > latestSpeeds[vpnName].timestamp) {
-      latestSpeeds[vpnName] = { timestamp, speed };
-    }
-  });
-  
-  // Calculate market average
-  const marketAvg = Object.values(latestSpeeds).reduce((sum, v) => sum + v.speed, 0) / Object.values(latestSpeeds).length;
-  
-  const anomalies = [];
-  
-  Object.keys(latestSpeeds).forEach(vpnName => {
-    const current = latestSpeeds[vpnName];
-    const historical = historicalSpeeds[vpnName] || [];
-    
-    if (historical.length < 3) return;
-    
-    const historicalAvg = historical.reduce((a, b) => a + b, 0) / historical.length;
-    
-    const historicalRatio = current.speed / historicalAvg;
-    const relativeRatio = current.speed / marketAvg;
-    
-    if (historicalRatio < OUTAGE_CONFIG.HISTORICAL_THRESHOLD || relativeRatio < OUTAGE_CONFIG.RELATIVE_THRESHOLD) {
-      anomalies.push({
-        timestamp: current.timestamp,
-        vpnName: vpnName,
-        speed: current.speed,
-        reason: `Historical: ${(historicalRatio * 100).toFixed(0)}%, Relative: ${(relativeRatio * 100).toFixed(0)}%`,
-        consecutiveCount: 1
+    if (outages.length > 0) {
+      outages.forEach(outage => {
+        notifyAdvancedOutage(outage);
+        saveAdvancedOutageToSheet(outage);
       });
     }
-  });
-  
-  return anomalies;
+    
+    return outages;
+    
+  } catch (error) {
+    Logger.log(`❌ エラー: ${error}`);
+    return [];
+  }
 }
 
-function setupOutageSheet() {
-  const ss = SpreadsheetApp.openById(OUTAGE_CONFIG.SPREADSHEET_ID);
-  let sheet = ss.getSheetByName(OUTAGE_CONFIG.OUTAGE_SHEET);
+function getHistoricalAverages() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const speedSheet = ss.getSheetByName('速度データ');
+  
+  if (!speedSheet || speedSheet.getLastRow() < 2) return {};
+  
+  const data = speedSheet.getRange(2, 1, Math.min(speedSheet.getLastRow() - 1, 200), speedSheet.getLastColumn()).getValues();
+  const vpnSpeeds = {};
+  const cutoffDate = new Date();
+  cutoffDate.setDate(cutoffDate.getDate() - 7);
+  
+  data.forEach(row => {
+    if (row[0] < cutoffDate) return;
+    if (row[1] && row[2] && typeof row[2] === 'number') {
+      if (!vpnSpeeds[row[1]]) vpnSpeeds[row[1]] = [];
+      vpnSpeeds[row[1]].push(row[2]);
+    }
+  });
+  
+  const averages = {};
+  Object.keys(vpnSpeeds).forEach(vpnName => {
+    const speeds = vpnSpeeds[vpnName];
+    averages[vpnName] = { average: speeds.reduce((a, b) => a + b, 0) / speeds.length };
+  });
+  
+  return averages;
+}
+
+function calculateMedian(numbers) {
+  const sorted = numbers.slice().sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 === 0 ? (sorted[middle - 1] + sorted[middle]) / 2 : sorted[middle];
+}
+
+function checkConsecutiveOutages(vpnName) {
+  const cache = CacheService.getScriptCache();
+  const count = cache.get(`consecutive_outage_${vpnName}`);
+  return count ? parseInt(count) : 0;
+}
+
+function recordConsecutiveOutage(vpnName) {
+  const cache = CacheService.getScriptCache();
+  cache.put(`consecutive_outage_${vpnName}`, (checkConsecutiveOutages(vpnName) + 1).toString(), 7200);
+}
+
+function clearConsecutiveOutage(vpnName) {
+  CacheService.getScriptCache().remove(`consecutive_outage_${vpnName}`);
+}
+
+function notifyAdvancedOutage(outageInfo) {
+  const tweet = `⚠️ ${outageInfo.vpn} 速度異常を検知
+
+現在の速度: ${outageInfo.speed}Mbps
+${outageInfo.historicalInfo || '通常より著しく低速'}
+
+詳細▶️ https://www.blstweb.jp/network/vpn/vpn-speed-ranking/
+
+#VPN #障害情報`;
+  
+  if (typeof postToTwitter === 'function') {
+    postToTwitter(tweet);
+  }
+}
+
+function saveAdvancedOutageToSheet(outageInfo) {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sheet = ss.getSheetByName(OUTAGE_ADVANCED_SHEET_NAME);
   
   if (!sheet) {
-    sheet = ss.insertSheet(OUTAGE_CONFIG.OUTAGE_SHEET);
+    sheet = ss.insertSheet(OUTAGE_ADVANCED_SHEET_NAME);
+    sheet.appendRow(['タイムスタンプ', 'VPNサービス', '速度 (Mbps)', '理由', '連続回数', '通知済み']);
+    sheet.getRange(1, 1, 1, 6).setFontWeight('bold').setBackground('#ea4335').setFontColor('#ffffff');
   }
   
-  const headers = ['タイムスタンプ', 'VPN名', '速度', '理由', '連続回数'];
-  sheet.getRange(1, 1, 1, headers.length).setValues([headers])
-    .setFontWeight('bold').setBackground('#4285f4').setFontColor('#ffffff');
+  sheet.appendRow([outageInfo.timestamp, outageInfo.vpn, outageInfo.speed, outageInfo.reasons.join(', '), outageInfo.consecutiveCount, '通知済み']);
+}
+
+function setupAdvancedOutageDetectionTriggers() {
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => {
+    if (trigger.getHandlerFunction() === 'detectAdvancedOutages') {
+      ScriptApp.deleteTrigger(trigger);
+    }
+  });
   
-  Logger.log('✅ Outage sheet setup complete');
+  ScriptApp.newTrigger('detectAdvancedOutages').timeBased().everyHours(1).create();
+  Logger.log('✅ トリガー設定完了: 1時間ごと');
+}
+
+function testAdvancedOutageDetection() {
+  detectAdvancedOutages();
 }
