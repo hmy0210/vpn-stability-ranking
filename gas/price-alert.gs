@@ -1,167 +1,275 @@
 /**
  * ============================================
- * VPN Price Alert System
- * Automated price change detection and alerts
+ * エンジン2A改善: 価格変動アラート
+ * 前日比で価格が変動したら自動Twitter投稿
  * ============================================
  * 
- * Features:
- * - Detects 5%+ price changes
- * - Auto-posts to Twitter (optional)
- * - Historical price comparison
+ * 機能:
+ * - 価格変動チェック（5%以上の変動を検出）
+ * - Twitter自動投稿
+ * - Spreadsheet保存
  * 
- * Setup:
- * 1. Configure Twitter API in config.gs (optional)
- * 2. Set up daily trigger after price scraping
- * 
- * Repository: https://github.com/yourusername/vpn-stability-ranking
+ * @author Tokyo VPN Speed Monitor Project
+ * @version 1.0
+ * @license MIT
  */
 
-// ==================== Configuration ====================
-const ALERT_CONFIG = {
-  SPREADSHEET_ID: typeof CONFIG !== 'undefined' ? CONFIG.SPREADSHEET_ID : '',
-  SHEET_NAME: typeof CONFIG !== 'undefined' ? CONFIG.SHEETS.PRICE_HISTORY : 'VPN料金履歴',
-  PRICE_THRESHOLD: 5, // Alert if price changes by 5% or more
-  USE_TWITTER: typeof TWITTER_CONFIG !== 'undefined' && TWITTER_CONFIG.CONSUMER_KEY !== 'YOUR_CONSUMER_KEY'
-};
+const PRICE_ALERT_SHEET_NAME = 'VPN料金履歴';
 
-// ==================== Main: Check Price Changes ====================
-function checkPriceChanges() {
+// ==========================================
+// 価格変動チェック & アラート
+// ==========================================
+
+/**
+ * 価格変動をチェックしてアラートを送信
+ * @returns {Array} 検出された価格変動
+ */
+function checkPriceChangesAndAlert() {
   Logger.log('==========================================');
-  Logger.log('Price Change Detection Started');
-  Logger.log(`Timestamp: ${new Date().toLocaleString('ja-JP')}`);
+  Logger.log('価格変動チェック開始');
+  Logger.log(`実行時刻: ${new Date().toLocaleString('ja-JP')}`);
   Logger.log('==========================================');
-  Logger.log('');
   
-  const ss = SpreadsheetApp.openById(ALERT_CONFIG.SPREADSHEET_ID);
-  const sheet = ss.getSheetByName(ALERT_CONFIG.SHEET_NAME);
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(PRICE_ALERT_SHEET_NAME);
   
-  if (!sheet || sheet.getLastRow() <= 1) {
-    Logger.log('❌ No price data available');
-    return;
+  if (!sheet || sheet.getLastRow() < 3) {
+    Logger.log('⚠️ データ不足: 比較できる過去データがありません');
+    return [];
   }
   
-  const priceChanges = detectPriceChanges(sheet);
+  const lastRow = sheet.getLastRow();
+  const data = sheet.getRange(2, 1, lastRow - 1, 8).getValues();
   
-  if (priceChanges.length > 0) {
-    Logger.log(`🔔 Detected ${priceChanges.length} significant price changes`);
-    
-    priceChanges.forEach(change => {
-      Logger.log('');
-      Logger.log(`VPN: ${change.vpnName}`);
-      Logger.log(`  Old: ${change.currency} ${change.oldPrice}`);
-      Logger.log(`  New: ${change.currency} ${change.newPrice}`);
-      Logger.log(`  Change: ${change.percentChange > 0 ? '+' : ''}${change.percentChange.toFixed(1)}%`);
-      
-      // Post to Twitter if enabled
-      if (ALERT_CONFIG.USE_TWITTER) {
-        postPriceAlertToTwitter(change);
-      }
-    });
-    
-    Logger.log('');
-    Logger.log('==========================================');
-    Logger.log('✅ Price change detection complete');
-    Logger.log('==========================================');
-  } else {
-    Logger.log('ℹ️ No significant price changes detected');
-  }
-}
-
-// ==================== Detect Price Changes ====================
-function detectPriceChanges(sheet) {
-  const data = sheet.getRange(2, 1, sheet.getLastRow() - 1, 6).getValues();
+  // VPNごとに最新2件を取得
+  const vpnLatestPrices = {};
   
-  // Group by VPN
-  const vpnPrices = {};
-  
-  data.forEach(row => {
-    const vpnName = row[1];
-    const timestamp = new Date(row[0]);
-    const price = row[2];
-    const currency = row[3];
-    const isFallback = row[5] === 'はい';
+  data.reverse().forEach(row => {
+    const [timestamp, vpnName, price, currency, method, fallback, candidates, notes] = row;
     
-    // Skip fallback prices
-    if (isFallback) return;
-    
-    if (!vpnPrices[vpnName]) {
-      vpnPrices[vpnName] = [];
+    if (!vpnLatestPrices[vpnName]) {
+      vpnLatestPrices[vpnName] = [];
     }
     
-    vpnPrices[vpnName].push({
-      timestamp: timestamp,
-      price: price,
-      currency: currency
-    });
-  });
-  
-  // Detect changes
-  const changes = [];
-  
-  Object.keys(vpnPrices).forEach(vpnName => {
-    const prices = vpnPrices[vpnName];
-    
-    if (prices.length < 2) return;
-    
-    // Sort by timestamp
-    prices.sort((a, b) => b.timestamp - a.timestamp);
-    
-    const latest = prices[0];
-    const previous = prices[1];
-    
-    // Check if currency matches
-    if (latest.currency !== previous.currency) return;
-    
-    // Calculate change
-    const change = ((latest.price - previous.price) / previous.price) * 100;
-    
-    // Check threshold
-    if (Math.abs(change) >= ALERT_CONFIG.PRICE_THRESHOLD) {
-      changes.push({
-        vpnName: vpnName,
-        oldPrice: previous.price,
-        newPrice: latest.price,
-        currency: latest.currency,
-        percentChange: change,
-        changeType: change > 0 ? '値上げ' : '値下げ'
+    if (vpnLatestPrices[vpnName].length < 2) {
+      vpnLatestPrices[vpnName].push({
+        timestamp: timestamp,
+        price: price,
+        currency: currency,
+        method: method
       });
     }
   });
   
-  return changes;
+  // 価格変動をチェック
+  const priceChanges = [];
+  
+  Object.keys(vpnLatestPrices).forEach(vpnName => {
+    const prices = vpnLatestPrices[vpnName];
+    
+    if (prices.length < 2) {
+      Logger.log(`${vpnName}: データ不足（1件のみ）`);
+      return;
+    }
+    
+    const latest = prices[0];
+    const previous = prices[1];
+    
+    // 通貨が異なる場合はスキップ
+    if (latest.currency !== previous.currency) {
+      Logger.log(`${vpnName}: 通貨変更（${previous.currency} → ${latest.currency}）`);
+      return;
+    }
+    
+    // 価格変動を計算
+    const priceDiff = latest.price - previous.price;
+    const percentChange = ((priceDiff / previous.price) * 100).toFixed(1);
+    
+    Logger.log(`${vpnName}: ${previous.currency} ${previous.price} → ${latest.price} (${percentChange > 0 ? '+' : ''}${percentChange}%)`);
+    
+    // 値下がりのみアラート（5%以上）
+    if (priceDiff < 0 && Math.abs(percentChange) >= 5) {
+      priceChanges.push({
+        vpnName: vpnName,
+        previousPrice: previous.price,
+        currentPrice: latest.price,
+        currency: latest.currency,
+        percentChange: percentChange,
+        priceDiff: Math.abs(priceDiff)
+      });
+    }
+  });
+  
+  Logger.log('');
+  Logger.log(`価格変動検出: ${priceChanges.length}件`);
+  
+  // アラート送信
+  if (priceChanges.length > 0) {
+    priceChanges.forEach(change => {
+      sendPriceAlert(change);
+    });
+  } else {
+    Logger.log('ℹ️ 有意な価格変動なし');
+  }
+  
+  return priceChanges;
 }
 
-// ==================== Post to Twitter ====================
-function postPriceAlertToTwitter(change) {
-  if (!ALERT_CONFIG.USE_TWITTER) {
-    Logger.log('  ℹ️ Twitter posting disabled');
+// ==========================================
+// 価格アラートTwitter投稿
+// ==========================================
+
+/**
+ * 価格アラートを送信
+ * @param {Object} priceChange - 価格変動情報
+ */
+function sendPriceAlert(priceChange) {
+  Logger.log('--- 価格変動アラート ---');
+  Logger.log(`VPN: ${priceChange.vpnName}`);
+  Logger.log(`価格: ${priceChange.currency} ${priceChange.previousPrice} → ${priceChange.currentPrice}`);
+  Logger.log(`変動: ${priceChange.percentChange}%`);
+  
+  const tweet = generatePriceAlertTweet(priceChange);
+  
+  Logger.log('📝 Twitter投稿内容:');
+  Logger.log(tweet);
+  
+  try {
+    if (typeof postToTwitter === 'function') {
+      const result = postToTwitter(tweet);
+      if (result) {
+        Logger.log('✅ Twitter投稿成功');
+      } else {
+        Logger.log('⚠️ Twitter投稿失敗');
+      }
+    } else {
+      Logger.log('⚠️ postToTwitter関数が見つかりません');
+    }
+  } catch (error) {
+    Logger.log(`❌ Twitter投稿エラー: ${error}`);
+  }
+}
+
+/**
+ * 価格アラートツイートを生成
+ * @param {Object} priceChange - 価格変動情報
+ * @returns {string} ツイート内容
+ */
+function generatePriceAlertTweet(priceChange) {
+  const currencySymbol = {
+    'JPY': '¥',
+    'USD': '$',
+    'EUR': '€',
+    'GBP': '£'
+  }[priceChange.currency] || priceChange.currency;
+  
+  const tweet = `🔥 ${priceChange.vpnName} 価格変動！
+
+${currencySymbol}${priceChange.previousPrice} → ${currencySymbol}${priceChange.currentPrice}
+（${Math.abs(priceChange.percentChange)}% OFF）
+
+今がチャンス！
+
+詳細▶️ https://www.blstweb.jp/network/vpn/tokyo-vpn-speed-monitor/
+
+#VPN #${priceChange.vpnName.replace(/\s+/g, '')} #セール情報`;
+  
+  return tweet;
+}
+
+// ==========================================
+// 統合実行
+// ==========================================
+
+/**
+ * スクレイピング → 価格変動チェック統合実行
+ */
+function scrapePricingAndCheckAlerts() {
+  Logger.log('==========================================');
+  Logger.log('料金スクレイピング＆価格変動チェック');
+  Logger.log('==========================================');
+  
+  // 1. 料金スクレイピング実行
+  Logger.log('【Step 1】料金スクレイピング');
+  if (typeof scrapePricingAndSave === 'function') {
+    scrapePricingAndSave();
+  } else {
+    Logger.log('❌ scrapePricingAndSave関数が見つかりません');
     return;
   }
   
-  const emoji = change.percentChange < 0 ? '⬇️' : '⬆️';
-  const symbol = change.currency === 'JPY' ? '¥' : change.currency === 'USD' ? '$' : '€';
+  Logger.log('');
+  Logger.log('【Step 2】価格変動チェック');
   
-  const tweet = `${emoji} ${change.vpnName} 価格${change.changeType}
-
-${symbol}${change.oldPrice} → ${symbol}${change.newPrice}
-変動: ${change.percentChange > 0 ? '+' : ''}${change.percentChange.toFixed(1)}%
-
-#VPN #価格変動`;
+  Utilities.sleep(3000);
   
-  try {
-    // This would call the Twitter posting function
-    // postToTwitter(tweet);
-    Logger.log(`  🐦 Would post to Twitter: ${tweet.substring(0, 50)}...`);
-  } catch (error) {
-    Logger.log(`  ❌ Twitter posting failed: ${error.message}`);
-  }
+  // 2. 価格変動チェック
+  checkPriceChangesAndAlert();
+  
+  Logger.log('');
+  Logger.log('✅ 完了');
 }
 
-// ==================== Test Function ====================
-function testPriceChangeDetection() {
-  Logger.log('Testing price change detection...');
+// ==========================================
+// トリガー設定
+// ==========================================
+
+/**
+ * 価格アラートトリガーを設定
+ */
+function setupPriceAlertTriggers() {
+  Logger.log('==========================================');
+  Logger.log('価格アラートトリガー設定');
+  Logger.log('==========================================');
   
-  checkPriceChanges();
+  const triggers = ScriptApp.getProjectTriggers();
+  triggers.forEach(trigger => {
+    if (trigger.getHandlerFunction() === 'scrapePricingAndSave' ||
+        trigger.getHandlerFunction() === 'scrapePricingAndCheckAlerts') {
+      ScriptApp.deleteTrigger(trigger);
+      Logger.log('🗑️ 既存トリガー削除');
+    }
+  });
   
-  Logger.log('✅ Test complete');
+  ScriptApp.newTrigger('scrapePricingAndCheckAlerts')
+    .timeBased()
+    .atHour(9)
+    .everyDays(1)
+    .create();
+  
+  Logger.log('✅ トリガー設定完了: 毎日 午前9時');
+}
+
+// ==========================================
+// テスト
+// ==========================================
+
+/**
+ * 価格変動アラートテスト
+ */
+function testPriceAlert() {
+  checkPriceChangesAndAlert();
+}
+
+/**
+ * モックデータでテスト
+ */
+function testPriceAlertWithMockData() {
+  Logger.log('==========================================');
+  Logger.log('価格変動アラート モックテスト');
+  Logger.log('==========================================');
+  
+  const mockChange = {
+    vpnName: 'NordVPN',
+    previousPrice: 500,
+    currentPrice: 370,
+    currency: 'JPY',
+    percentChange: -26.0,
+    priceDiff: 130
+  };
+  
+  Logger.log('モックデータ:');
+  Logger.log(JSON.stringify(mockChange, null, 2));
+  
+  sendPriceAlert(mockChange);
 }
