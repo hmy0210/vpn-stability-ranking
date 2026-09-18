@@ -1,6 +1,21 @@
 # 🚀 Tokyo VPN Speed Monitor v2.0
 
-Real-time VPN speed, stability, and **trust score** monitoring system from Tokyo, Japan.
+> ### ⚠️ Correction (September 2026): speed figures are estimates, not measurements
+>
+> This project previously described its speed and stability figures as automated measurements.
+> That was incorrect. `gas/vpn-speed-tracker.gs` generates them from a hard-coded base value per
+> provider plus a random offset and a time-of-day multiplier — see `measureVPNSpeed()`. It performs
+> no network measurement, and Google Apps Script cannot route traffic through a VPN tunnel in any
+> case. The function name is misleading and is the reason the error went unnoticed for so long.
+>
+> **Genuine data collected by this project:** pricing (15 providers, daily, JPY, from official
+> pages), server and country counts, and the Trust Score rubric (15 providers × 10 published
+> criteria, with rationale).
+>
+> Dataset descriptions on Zenodo, Harvard Dataverse, figshare, Mendeley Data, Kaggle and
+> IEEE DataPort are being corrected accordingly.
+
+VPN pricing, trust-score and outage monitoring for Japan. Speed figures are modelled estimates, not measurements.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![DOI](https://img.shields.io/badge/DOI-10.7910%2FDVN%2FOMC9A4-blue)](https://doi.org/10.7910/DVN/OMC9A4)
