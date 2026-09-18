@@ -1,4 +1,11 @@
 /**
+ * ⚠️ This file does NOT measure anything.
+ * measureVPNSpeed() returns a modelled estimate: a per-provider base value plus a random
+ * offset and a time-of-day multiplier. The name is historical and misleading.
+ * Do not present its output as measured data.
+ */
+
+/**
  * ============================================
  * VPN速度測定システム v3.3 - 安定性重視版
  * エンジン1: 速度ランキング + 安定性分析
