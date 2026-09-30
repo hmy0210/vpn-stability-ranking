@@ -83,7 +83,7 @@ Automated VPN performance monitoring system that tests **15 major VPN services**
 
 | Engine | Function | Frequency | Output |
 |--------|----------|-----------|--------|
-| **1** | VPN Speed Measurement | Every 6 hours | Speed ranking, stability score |
+| **1** | VPN Speed Estimates (modelled, no network measurement) | On editorial revision | Speed ranking (estimates) |
 | **2a** | Price Scraping | Daily 9:00 AM | Price data, change alerts |
 | **2a+** | Price Alert | On price change | Twitter notification |
 | **2b** | Outage Detection | Hourly | Anomaly detection |
@@ -165,7 +165,7 @@ Trust Score evaluates VPN providers on **10 privacy and transparency criteria**:
 ```
 vpn-stability-ranking/
 ├── gas/
-│   ├── vpn-speed-tracker.gs        # Engine 1: Speed measurement
+│   ├── vpn-speed-tracker.gs        # Engine 1: Speed estimates (no network measurement)
 │   ├── price-scraper.gs            # Engine 2a: Price scraping
 │   ├── price-alert.gs              # Engine 2a+: Price change alerts
 │   ├── outage-detector.gs          # Engine 2b: Outage detection
@@ -318,16 +318,16 @@ GET ?action=getTrustScores
 
 ### Twitter Auto-Post (Speed Ranking)
 ```
-📊 今日のVPN速度ランキング（日本実測）
+📊 VPN速度ランキング（編集部推定値）
 
 🥇 NordVPN: 485 Mbps
 🥈 ExpressVPN: 452 Mbps
 🥉 Private Internet Access: 421 Mbps
 
-測定時刻: 01/21 10:00
+最終改訂: 01/21 10:00
 詳細データ▶️ https://www.blstweb.jp/network/vpn/tokyo-vpn-speed-monitor/
 
-#VPN #速度測定 #リモートワーク
+#VPN #リモートワーク
 ```
 
 ### Twitter Auto-Post (Trust Score)

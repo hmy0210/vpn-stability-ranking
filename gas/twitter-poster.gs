@@ -222,16 +222,16 @@ function generateAndPostSpeedTweet() {
     
     const updateTime = Utilities.formatDate(new Date(data.lastUpdate), 'JST', 'MM/dd HH:mm');
     
-    const tweet = `📊 今日のVPN速度ランキング（日本実測）
+    const tweet = `📊 VPN速度ランキング（編集部推定値）
 
 🥇 ${vpn1}: ${speed1} Mbps
 🥈 ${vpn2}: ${speed2} Mbps
 🥉 ${vpn3}: ${speed3} Mbps
 
-測定時刻: ${updateTime}
+最終改訂: ${updateTime}
 詳細データ▶️ ${URL_CONFIG.SPEED_RANKING}
 
-#VPN #速度測定 #リモートワーク`;
+#VPN #リモートワーク`;
     
     Logger.log('📝 ツイート内容:\n' + tweet);
     
