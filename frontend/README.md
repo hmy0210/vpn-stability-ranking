@@ -45,7 +45,7 @@ Client-side VPN tools and widgets for embedding in websites.
 ### 1. VPN Speed Ranking Widget
 - Displays TOP5 fastest VPNs
 - Real-time data from Google Apps Script API
-- Auto-updates every 6 hours
+- Shows the latest speed estimates (not measurements)
 - Shows download speed, ping, stability score
 - Affiliate links ready
 
@@ -162,7 +162,7 @@ const VPN_LINKS = {
 ### Speed Ranking Widget
 
 **Data Source:** Google Apps Script Web App API  
-**Update Frequency:** Every 6 hours  
+**Update Frequency:** Speed estimates change only when the author revises them  
 **Data Points:** Download speed, Upload speed, Ping, Stability, Reliability  
 **Display:** TOP5 VPNs sorted by overall score  
 

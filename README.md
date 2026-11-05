@@ -1,19 +1,20 @@
 # 🚀 Tokyo VPN Speed Monitor v2.0
 
-> ### ⚠️ Correction (September 2026): speed figures are estimates, not measurements
+> ### ⚠️ Correction: speed figures are estimates, not measurements
 >
-> This project previously described its speed and stability figures as automated measurements.
-> That was incorrect. `gas/vpn-speed-tracker.gs` generates them from a hard-coded base value per
-> provider plus a random offset and a time-of-day multiplier — see `measureVPNSpeed()`. It performs
-> no network measurement, and Google Apps Script cannot route traffic through a VPN tunnel in any
-> case. The function name is misleading and is the reason the error went unnoticed for so long.
+> This project previously described its speed and stability figures as automated measurements
+> taken from Tokyo every 6 hours. That was incorrect. Until September 2026, `gas/vpn-speed-tracker.gs`
+> generated them from a hard-coded base value per provider plus a random offset and a time-of-day
+> multiplier (`measureVPNSpeed()`, [code at the time](https://github.com/hmy0210/vpn-stability-ranking/blob/3c8f08bb04b259605341662c62239bc2d383c069/gas/vpn-speed-tracker.gs)).
+> It performed no network measurement, and Google Apps Script cannot route traffic through a VPN
+> tunnel in any case. Since September 2026 the speed figures are fixed estimates set by the author.
 >
-> **Genuine data collected by this project:** pricing (15 providers, daily, JPY, from official
-> pages), server and country counts, and the Trust Score rubric (15 providers × 10 published
-> criteria, with rationale).
+> **Genuine data collected by this project:** pricing (15 providers, daily, from official pages)
+> and the Trust Score (15 providers × 10 published criteria, with the reason for each score).
 >
-> Dataset descriptions on Zenodo, Harvard Dataverse, figshare, Mendeley Data, Kaggle and
-> IEEE DataPort are being corrected accordingly.
+> In November 2026 the descriptions on every repository where the dataset was published were
+> corrected, and the Zenodo paper was replaced with a correction notice:
+> https://doi.org/10.5281/zenodo.18423131
 
 VPN pricing, trust-score and outage monitoring for Japan. Speed figures are modelled estimates, not measurements.
 
@@ -25,7 +26,7 @@ VPN pricing, trust-score and outage monitoring for Japan. Speed figures are mode
 
 ## 📊 Overview
 
-Automated VPN performance monitoring system that tests **15 major VPN services** every 6 hours from Tokyo. Now with **Trust Score** - a comprehensive privacy and transparency evaluation.
+Price, Trust Score and outage monitoring for **15 VPN services** in Japan. The speed figures are estimates set by the author, not measurements (see the correction above).
 
 **Live Demo:** https://www.blstweb.jp/network/vpn/tokyo-vpn-speed-monitor/
 
@@ -48,8 +49,8 @@ Automated VPN performance monitoring system that tests **15 major VPN services**
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐   │
 │  │  Engine 1   │  │  Engine 2a  │  │  Engine 2b  │  │  Engine 2b+ │   │
 │  │   Speed     │  │   Price     │  │   Outage    │  │    News     │   │
-│  │  Tracker    │  │  Scraper    │  │  Detector   │  │   Monitor   │   │
-│  │  (6h)       │  │  (Daily)    │  │  (1h)       │  │   (6h)      │   │
+│  │  Estimates  │  │  Scraper    │  │  Detector   │  │   Monitor   │   │
+│  │  (no meas.) │  │  (Daily)    │  │  (1h)       │  │   (6h)      │   │
 │  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘  └──────┬──────┘   │
 │         │                │                │                │           │
 │         └────────────────┼────────────────┼────────────────┘           │
@@ -224,7 +225,7 @@ vpn-stability-ranking/
 4. **Set up triggers**
    | Function | Schedule |
    |----------|----------|
-   | `measureAllVPNs` | Every 6 hours |
+   | `measureAllVPNs` | Manual, when the estimates are revised (no measurement) |
    | `scrapePricingAndCheckAlerts` | Daily 9:00 AM |
    | `detectAdvancedOutages` | Hourly |
    | `monitorVPNNews` | Every 6 hours |
@@ -376,6 +377,8 @@ Generates comprehensive market analysis including:
 
 ### Dataset DOIs
 
+> The speed values in all of these records were generated, not measured. Only the pricing and Trust Score files are genuine data.
+
 | Repository | DOI | Description |
 |------------|-----|-------------|
 | **Harvard Dataverse** | [10.7910/DVN/OMC9A4](https://doi.org/10.7910/DVN/OMC9A4) | Primary academic dataset |
@@ -391,11 +394,12 @@ Generates comprehensive market analysis including:
 ```bibtex
 @dataset{hamaya2026tokyo,
   author = {Hamaya, Takeshi},
-  title = {Tokyo VPN Speed Monitor: A Longitudinal Open Dataset of VPN Performance Metrics in Japan},
+  title = {Tokyo VPN Speed Monitor v2: daily VPN prices and Trust Scores},
   year = {2026},
-  publisher = {Zenodo},
-  doi = {10.5281/zenodo.18207135},
-  url = {https://doi.org/10.5281/zenodo.18207135}
+  publisher = {Harvard Dataverse},
+  doi = {10.7910/DVN/OMC9A4},
+  url = {https://doi.org/10.7910/DVN/OMC9A4},
+  note = {The speed values in this dataset are generated, not measured}
 }
 ```
 
@@ -432,7 +436,6 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🙏 Acknowledgments
 
-- Speed testing methodology inspired by VPN comparison research
 - Stability calculation based on statistical analysis (Coefficient of Variation)
 - Trust Score criteria based on EFF, Privacy International guidelines
 - Community feedback and contributions
@@ -443,17 +446,16 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 | Metric | Value |
 |--------|-------|
-| VPNs Monitored | 15 |
-| Total Measurements | 3,000+ |
-| Update Frequency | 6 hours |
-| Location | Tokyo, Japan |
-| Infrastructure Cost | $0/month |
-| Uptime | 99.8% |
+| VPNs covered | 15 |
+| Prices | Read daily from the providers' official pages |
+| Trust Score | 10 published criteria, with the reason for each score |
+| Speed figures | Estimates set by the author, not measurements |
+| Infrastructure | Google Apps Script |
 
 ---
 
-**Note:** This system is for educational and research purposes. VPN performance varies by location, time, and network conditions. Results are specific to Tokyo, Japan testing environment.
+**Note:** The speed figures are estimates and must not be used as measurements.
 
-**Data Update:** Every 6 hours automatically
+**Data Update:** Prices daily; speed estimates only when the author revises them
 
-**Last Updated:** January 2026
+**Last Updated:** November 2026

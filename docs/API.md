@@ -463,7 +463,7 @@ For price change alerts and outage notifications, the system posts to Twitter au
 
 | Data Type | Update Frequency |
 |-----------|------------------|
-| Speed Ranking | Every 6 hours |
+| Speed Ranking | When the estimates are revised (not measured) |
 | Stability Score | Calculated on request (7-day window) |
 | Price Data | Daily at 9:00 AM JST |
 | Trust Score | Monthly on 1st |
