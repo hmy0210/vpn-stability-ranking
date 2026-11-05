@@ -39,7 +39,7 @@ This folder contains all Google Apps Script (GAS) files for the Tokyo VPN Speed 
 
 | File | Engine | Description | Trigger |
 |------|--------|-------------|---------|
-| `speed-tracker.gs`   | 1 | Speed measurement for 15 VPNs | Every 6 hours |
+| `speed-tracker.gs`   | 1 | Speed estimates for 15 VPNs (no network measurement) | Manual |
 | `price-scraper.gs`   | 2a | Price scraping with ScraperAPI | Daily 9:00 AM |
 | `price-alert.gs`     | 2a+ | Price change detection & alerts | After price scraping |
 | `outage-detection.gs`| 2b | Statistical anomaly detection | Hourly |
@@ -122,7 +122,7 @@ Run these setup functions once:
 
 ```javascript
 // In main project:
-setupTriggers();           // Speed measurement (6h)
+setupTriggers();           // Triggers (speed estimates are not scheduled)
 setupPriceAlertTriggers(); // Price scraping (daily)
 setupAdvancedOutageDetectionTriggers(); // Outage (hourly)
 setupNewsMonitorTriggers(); // News (6h)
@@ -191,7 +191,7 @@ Deploy each project as a Web App:
 ## 📊 Data Flow
 
 ```
-[Speed Measurement] ──► 速度データ sheet ──┐
+[Speed Estimates] ──►   速度データ sheet ──┐
                                           │
 [Price Scraping] ────► VPN料金履歴 sheet ─┼──► [Engine 8 Report]
                                           │         │
